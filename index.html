@@ -1,0 +1,642 @@
+<title>AIやぐちさん</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+:root{
+  --sky-0:#eaf7ff; --sky-1:#d5eeff; --sky-2:#bfe6ff;
+  --cyan:#12a5db; --cyan-deep:#0a6ea6; --cyan-glow:#4fc9f2;
+  --ink:#123049; --ink-soft:#3d5c74; --muted:#6b8aa1;
+  --line:#cfe6f4; --panel:#ffffff; --panel-2:#f4fbff;
+  --coral:#ff5a4d; --coral-deep:#e0362b; --coral-soft:#ffe4e0;
+  --ok:#1aa87a;
+  --shadow:0 10px 40px rgba(16,90,140,.14);
+  --radius:20px;
+  --frame-blue:#7fcbfb;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:"Noto Sans JP",system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 700px at 15% -10%, #ffffff 0%, rgba(255,255,255,0) 55%),
+    radial-gradient(900px 600px at 110% 10%, #cdecff 0%, rgba(205,236,255,0) 60%),
+    linear-gradient(160deg, var(--sky-0), var(--sky-2));
+  min-height:100vh;
+}
+/* faint drifting sparkles behind everything */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.stars i{position:absolute;width:6px;height:6px;background:#fff;opacity:.0;
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
+  animation:twinkle 5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:.75;transform:scale(1)}}
+
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+
+header.top{display:flex;align-items:center;gap:14px;margin:6px 4px 20px}
+.logo{width:42px;height:42px;border-radius:12px;flex:none;
+  background:linear-gradient(150deg,var(--cyan-glow),var(--cyan-deep));
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;
+  font-family:"Zen Maru Gothic";box-shadow:0 6px 16px rgba(10,110,166,.35)}
+.top h1{font-family:"Zen Maru Gothic";font-weight:900;font-size:1.5rem;margin:0;letter-spacing:.01em}
+.top .sub{font-size:.8rem;color:var(--ink-soft);margin-top:2px}
+.top .spacer{flex:1}
+.voicebar{display:flex;align-items:center;gap:8px;background:var(--panel);
+  border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 14px;box-shadow:var(--shadow)}
+.voicebar label{font-size:.72rem;color:var(--muted);letter-spacing:.04em}
+.voicebar select{border:none;background:var(--panel-2);border-radius:999px;padding:6px 10px;
+  font-family:inherit;font-size:.8rem;color:var(--ink);max-width:170px}
+.voicebar select:focus-visible,.voicebar input:focus-visible{outline:2px solid var(--cyan)}
+.voicebar .vdiv{width:1px;height:20px;background:var(--line)}
+.voicebar input[type=range]{width:76px;accent-color:var(--coral);cursor:pointer}
+.trybtn{border:1px solid var(--line);background:var(--panel-2);border-radius:999px;
+  padding:6px 12px;font-family:inherit;font-size:.76rem;color:var(--cyan-deep);cursor:pointer;font-weight:700}
+.trybtn:hover{border-color:var(--cyan);background:#fff}
+@media(max-width:860px){.voicebar{flex-wrap:wrap;border-radius:16px}}
+
+.grid{display:grid;grid-template-columns:400px 1fr;gap:22px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+/* ---- character panel ---- */
+.stage{background:linear-gradient(180deg,#ffffff,#f0f9ff);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:sticky;top:16px}
+@media(max-width:860px){.stage{position:static}}
+.holo{position:relative;height:360px;background:
+    radial-gradient(120% 90% at 50% 20%, #bfe8ff 0%, #7fcbfb 55%, #57b8f2 100%);
+  display:grid;place-items:center;overflow:hidden}
+.rings{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.rings span{position:absolute;border:2px solid rgba(255,255,255,.55);border-radius:50%;
+  width:150px;height:150px;animation:ripple 3.6s ease-out infinite}
+.rings span:nth-child(2){animation-delay:1.2s}
+.rings span:nth-child(3){animation-delay:2.4s}
+@keyframes ripple{0%{transform:scale(.4);opacity:.0}20%{opacity:.7}100%{transform:scale(2.4);opacity:0}}
+/* character videos: idle / talkShort / talkLong をクロスフェードで切替 */
+.char{position:absolute;inset:0;z-index:2;width:100%;height:100%;
+  object-fit:cover;object-position:center 46%;opacity:0;transition:opacity .35s ease}
+.char.show{opacity:1}
+/* 全動画で表示サイズを統一（cover）— 切替時にサイズが変わらない */
+/* speaking glow — sits ABOVE the video so it's visible */
+.frameglow{position:absolute;inset:0;z-index:3;pointer-events:none;border-radius:inherit;
+  opacity:0;transition:opacity .35s;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.7),inset 0 0 46px rgba(80,201,242,.55)}
+.stage.speaking .frameglow{opacity:1;animation:pulse 1.05s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+.stage.thinking .rings span{animation-duration:1.6s}
+/* tiny thinking dots above head */
+.think{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:4;display:none;gap:6px}
+.stage.thinking .think{display:flex}
+.think b{width:9px;height:9px;border-radius:50%;background:#fff;opacity:.9;
+  box-shadow:0 2px 5px rgba(10,90,140,.3);animation:td 1s infinite}
+.think b:nth-child(2){animation-delay:.15s}.think b:nth-child(3){animation-delay:.3s}
+@keyframes td{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-6px);opacity:1}}
+
+.nameplate{padding:14px 18px 18px;text-align:center}
+.nameplate .nm{font-family:"Zen Maru Gothic";font-weight:900;font-size:1.15rem}
+.nameplate .role{font-size:.74rem;color:var(--muted);margin-top:2px;letter-spacing:.03em}
+.status{display:inline-flex;align-items:center;gap:7px;margin-top:12px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:999px;
+  padding:6px 14px;font-size:.78rem;color:var(--ink-soft);font-weight:500}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);
+  box-shadow:0 0 0 0 rgba(26,168,122,.5);animation:beat 2s infinite}
+@keyframes beat{0%{box-shadow:0 0 0 0 rgba(26,168,122,.5)}70%{box-shadow:0 0 0 8px rgba(26,168,122,0)}100%{box-shadow:0 0 0 0 rgba(26,168,122,0)}}
+.status.busy .dot{background:var(--coral)}
+
+/* ---- input / chat ---- */
+.inputcard{margin:0 16px 18px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:16px;padding:14px}
+.inputcard .lb{font-size:.78rem;font-weight:700;color:var(--cyan-deep);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px}
+textarea{width:100%;min-height:120px;resize:vertical;border:1px solid var(--line);
+  border-radius:12px;padding:12px;font-family:inherit;font-size:.9rem;line-height:1.6;
+  color:var(--ink);background:#fff}
+textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
+.hint{font-size:.72rem;color:var(--muted);margin:8px 2px 0;line-height:1.5}
+.btn{appearance:none;border:none;cursor:pointer;font-family:"Zen Maru Gothic";font-weight:700;
+  border-radius:12px;padding:13px 18px;font-size:.98rem;width:100%;margin-top:12px;
+  color:#fff;background:linear-gradient(150deg,var(--cyan-glow),var(--cyan-deep));
+  box-shadow:0 8px 20px rgba(10,110,166,.32);transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(10,110,166,.4)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.55;cursor:progress;transform:none}
+.btn.small{width:auto;padding:8px 14px;font-size:.82rem;margin:0}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:.72rem;border:1px dashed var(--line);background:#fff;color:var(--ink-soft);
+  border-radius:999px;padding:5px 11px;cursor:pointer;font-family:inherit}
+.chip:hover{border-color:var(--cyan);color:var(--cyan-deep)}
+
+/* ---- questions panel ---- */
+.qcol{display:flex;flex-direction:column;gap:18px}
+.section{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden}
+.section > h2{font-family:"Zen Maru Gothic";font-size:1.02rem;margin:0;padding:16px 20px;
+  display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#fff,#f6fcff)}
+.section > h2 .cnt{margin-left:auto;font-size:.74rem;color:var(--muted);font-weight:500;
+  font-family:"Noto Sans JP"}
+.pin-h{border-color:#ffd9d3}
+.pin-h{background:linear-gradient(180deg,#fff,#fff5f3) !important}
+.voice-h{background:linear-gradient(180deg,#fff,#f2fbf6) !important}
+/* 過去の履歴の1件 */
+.histrow{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;
+  display:flex;gap:10px;align-items:flex-start;animation:rise .3s ease both}
+.histrow .ht{font-size:.7rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;padding-top:2px}
+.histrow .hx{font-size:.9rem;line-height:1.5;color:var(--ink);word-break:break-word}
+.datanote{margin:0 14px 6px;font-size:.72rem;color:var(--muted)}
+.datanote.warn{color:var(--coral-deep)}
+.qlist{padding:14px;display:flex;flex-direction:column;gap:12px}
+
+.qcard{border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;background:#fff;
+  display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,box-shadow .15s;
+  animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.qcard:hover{border-color:var(--cyan-glow);box-shadow:0 6px 18px rgba(16,120,180,.12)}
+.qcard.playing{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(79,201,242,.25)}
+.qnum{flex:none;width:26px;height:26px;border-radius:8px;background:var(--sky-1);color:var(--cyan-deep);
+  font-family:"Zen Maru Gothic";font-weight:900;font-size:.82rem;display:grid;place-items:center}
+.qcard.pinned .qnum{background:var(--coral-soft);color:var(--coral-deep)}
+.qbody{flex:1;min-width:0}
+.qtext{font-size:.96rem;line-height:1.55;font-weight:500;color:var(--ink)}
+.qnote{font-size:.76rem;color:var(--muted);margin-top:6px;line-height:1.5;
+  padding-left:10px;border-left:2px solid var(--line)}
+.qacts{display:flex;gap:7px;margin-top:11px}
+.iact{border:1px solid var(--line);background:var(--panel-2);border-radius:9px;cursor:pointer;
+  font-family:inherit;font-size:.76rem;color:var(--ink-soft);padding:6px 11px;
+  display:inline-flex;align-items:center;gap:5px;transition:.12s}
+.iact:hover{border-color:var(--cyan);color:var(--cyan-deep);background:#fff}
+.iact.on{background:var(--coral);border-color:var(--coral);color:#fff}
+.iact.play.on{background:var(--cyan);border-color:var(--cyan);color:#fff}
+.iact svg{width:14px;height:14px}
+
+.empty{padding:34px 22px;text-align:center;color:var(--muted);font-size:.86rem;line-height:1.7}
+.empty .big{font-size:2rem;margin-bottom:8px}
+.err{margin:0 14px 14px;background:var(--coral-soft);border:1px solid #ffc9c2;color:var(--coral-deep);
+  border-radius:12px;padding:12px 14px;font-size:.82rem;line-height:1.5}
+.skel{height:70px;border-radius:14px;background:linear-gradient(100deg,#eef7fd 30%,#dcf0fb 50%,#eef7fd 70%);
+  background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;line-height:1.7}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;animation-iteration-count:1 !important}}
+</style>
+
+<div class="stars" id="stars" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">AI</div>
+    <div>
+      <h1>AIやぐちさん</h1>
+      <div class="sub">議案から「市民の素朴な疑問」を考えるAIアシスタント</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="voicebar">
+      <label for="voice">音声</label>
+      <select id="voice" aria-label="読み上げ音声を選択"></select>
+      <span class="vdiv"></span>
+      <label for="pitch">かわいさ</label>
+      <input id="pitch" type="range" min="1" max="2" step="0.05" value="1.5" aria-label="声の高さ（かわいさ）">
+      <label for="rate">速さ</label>
+      <input id="rate" type="range" min="0.7" max="1.3" step="0.05" value="1" aria-label="読み上げの速さ">
+      <button class="trybtn" id="tryVoice" type="button">🔊 試聴</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: character + input -->
+    <section class="stage" id="stage" aria-label="AIやぐちさん">
+      <div class="holo">
+        <div class="rings" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="frameglow" aria-hidden="true"></div>
+        <div class="think" aria-hidden="true"><b></b><b></b><b></b></div>
+        <video class="char" id="talkLong" loop muted playsinline preload="auto" aria-label="AIやぐちさん(歩く)"><source src="talk-long.mp4" type="video/mp4"></video>
+        <video class="char show" id="idleVid" autoplay loop muted playsinline preload="auto"><source src="idle.mp4" type="video/mp4"></video>
+        <video class="char" id="talkShort" loop muted playsinline preload="auto" aria-label="AIやぐちさんのキャラクター"><source src="talk-short.mp4" type="video/mp4"></video>
+      </div>
+      <div class="nameplate">
+        <div class="nm">AIやぐちさん</div>
+        <div class="role">町田市議会 AIアシスタント</div>
+        <div class="status" id="status"><span class="dot"></span><span id="statusText">スタンバイ中</span></div>
+      </div>
+
+      <div class="inputcard">
+        <div class="lb">💬 議案をここに貼り付け</div>
+        <textarea id="agenda" placeholder="例）財務部 第53号議案 減債基金条例。償還に必要な財源確保のため減債基金を制定する。臨時財政対策債の元利償還金を積み立てる…"></textarea>
+        <div class="presets" id="presets"></div>
+        <button class="btn" id="gen">🔍 素朴な疑問を考えてもらう</button>
+        <p class="hint">貼り付けた議案について、AIやぐちさんが「市民が気になりそうな質問」を提案します。気に入った質問は📌でストックしておけます。</p>
+      </div>
+    </section>
+
+    <!-- RIGHT: questions -->
+    <div class="qcol">
+      <section class="section" id="pinSection" hidden>
+        <h2 class="pin-h">📌 ストックした質問 <span class="cnt" id="pinCnt"></span></h2>
+        <div class="qlist" id="pinList"></div>
+      </section>
+
+      <section class="section">
+        <h2>❓ 市民の素朴な疑問 <span class="cnt" id="genCnt"></span></h2>
+        <div id="errBox"></div>
+        <div class="qlist" id="genList">
+          <div class="empty" id="emptyState">
+            <div class="big">💭</div>
+            左に議案を貼り付けて「素朴な疑問を考えてもらう」を押すと、<br>AIやぐちさんが質問候補を出してくれます。
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🕘 過去の履歴 <span class="cnt" id="histCnt"></span></h2>
+        <div class="qlist" id="histList">
+          <div class="empty" id="histEmpty">これまでに入力した議案・プロンプトがここに記録されます。</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="voice-h">📣 市民からの声 <span class="cnt" id="voiceCnt"></span></h2>
+        <div class="qlist" id="voiceList">
+          <div class="empty" id="voiceEmpty">アンケートから届いた市民の声がここに表示されます。</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    AIが生成した質問案です。実際の質疑の前に、矢口議員ご本人の視点で取捨選択してお使いください。<br>
+    読み上げには端末の音声合成（Web Speech API）を使用しています。
+  </footer>
+</div>
+
+<script>
+/* ---------- sparkles ---------- */
+(function(){
+  const box=document.getElementById('stars');let h='';
+  for(let i=0;i<28;i++){const x=Math.random()*100,y=Math.random()*100,d=(Math.random()*5).toFixed(1),s=(4+Math.random()*4).toFixed(1);
+    h+=`<i style="left:${x}%;top:${y}%;animation-delay:${d}s;animation-duration:${s}s"></i>`;}
+  box.innerHTML=h;
+})();
+
+/* ===================================================================
+   設定：Google Apps Script のウェブアプリURL をここに貼り付けてください。
+   （例）const GAS_URL = "https://script.google.com/macros/s/XXXXX/exec";
+   空のままだと、履歴の記録・市民の声の読み込みは無効になります（他機能は動作）。
+   =================================================================== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwCnyDGAwWvvglx0m7UUS3Z_DreCD0ZBgA_Ms_ZHv00t8W80NDNzYWru6uJIHbmlWPQ/exec";
+const POLL_MS = 15000;     // スプレッドシートを見に行く間隔（ミリ秒）
+
+/* ---------- state ---------- */
+const PIN_KEY='aiyaguchi_pins_v1';
+let pins=[]; try{pins=JSON.parse(localStorage.getItem(PIN_KEY)||'[]')}catch(e){pins=[]}
+let gen=[];                // current generated questions [{id,q,note}]
+let playingId=null;
+let sampleFn=null;         // resolved claude sample capability
+const gasReady = /^https:\/\//.test(GAS_URL);
+
+/* ---------- character state (video provides the motion) ---------- */
+const stage=document.getElementById('stage');
+const statusEl=document.getElementById('status');
+const statusText=document.getElementById('statusText');
+const idleVid=document.getElementById('idleVid');     // 待機（1パターン・常時ループ）
+const talkShort=document.getElementById('talkShort'); // 発話・短(6秒以内)
+const talkLong=document.getElementById('talkLong');   // 発話・長(7秒以上, 歩く)
+const allVids=[idleVid,talkShort,talkLong];
+let mode='idle';
+
+function kick(v){ if(!v)return; try{ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); }catch(e){} }
+function showVideo(el){ allVids.forEach(v=>{ if(v) v.classList.toggle('show', v===el); }); }
+// 待機動画は常に再生。自動再生がブロックされた場合は最初のクリックで開始。
+if(idleVid){ idleVid.addEventListener('canplay',()=>kick(idleVid)); kick(idleVid);
+  document.addEventListener('click',()=>kick(idleVid),{once:true}); }
+
+function setState(m){ // idle | thinking | speaking
+  mode=m;
+  stage.classList.toggle('thinking',m==='thinking');
+  stage.classList.toggle('speaking',m==='speaking');
+  statusEl.classList.toggle('busy',m!=='idle');
+  statusText.textContent = m==='thinking'?'考え中…':m==='speaking'?'お話し中…':'スタンバイ中';
+  if(m!=='speaking'){ // 待機/考え中 → 待機動画へ、発話動画は停止
+    showVideo(idleVid); kick(idleVid);
+    try{talkShort.pause();}catch(e){} try{talkLong.pause();}catch(e){}
+  }
+  // speaking時の動画選択は speak() 側で行う
+}
+
+/* ---------- voice (Web Speech) ---------- */
+let voices=[], chosen=null;
+const voiceSel=document.getElementById('voice');
+const pitchEl=document.getElementById('pitch');
+const rateEl=document.getElementById('rate');
+// restore saved voice prefs
+try{const s=JSON.parse(localStorage.getItem('aiyaguchi_voice_v1')||'{}');
+  if(s.pitch)pitchEl.value=s.pitch; if(s.rate)rateEl.value=s.rate;}catch(e){}
+function saveVoicePrefs(){try{localStorage.setItem('aiyaguchi_voice_v1',
+  JSON.stringify({pitch:pitchEl.value,rate:rateEl.value,name:chosen&&chosen.name}))}catch(e){}}
+
+// rank voices so the "cutest" (bright, young, female) sits first
+function cuteScore(v){
+  const n=v.name.toLowerCase();let s=0;
+  if(/google/.test(n))s+=5;                     // Google ja voices are clear & bright
+  if(/(女|female|nanami|haruka|sayaka|ayumi|kyoko|mizuki|o-ren|kaori|otoya)/.test(n))s+=3;
+  if(/(male|男|otoya|ichiro|hattori)/.test(n))s-=6;
+  return s;
+}
+function loadVoices(){
+  voices=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>/ja|JP/i.test(v.lang));
+  if(!voices.length){voiceSel.innerHTML='<option>日本語音声がありません</option>';voiceSel.disabled=true;return;}
+  voices.sort((a,b)=>cuteScore(b)-cuteScore(a));
+  let saved=null;try{saved=JSON.parse(localStorage.getItem('aiyaguchi_voice_v1')||'{}').name}catch(e){}
+  const pref=voices.find(v=>v.name===saved)||voices[0];
+  voiceSel.innerHTML=voices.map((v,i)=>`<option value="${i}"${v===pref?' selected':''}>${v.name.replace(/\\(.*?\\)/,'').trim()}</option>`).join('');
+  chosen=pref;
+}
+if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+else{voiceSel.innerHTML='<option>読み上げ非対応</option>';voiceSel.disabled=true;}
+voiceSel.addEventListener('change',()=>{chosen=voices[+voiceSel.value]||null;saveVoicePrefs();});
+pitchEl.addEventListener('change',saveVoicePrefs);
+rateEl.addEventListener('change',saveVoicePrefs);
+
+function makeUtter(text){
+  const u=new SpeechSynthesisUtterance(text);
+  if(chosen)u.voice=chosen; u.lang='ja-JP';
+  u.pitch=parseFloat(pitchEl.value)||1.5;
+  u.rate=parseFloat(rateEl.value)||1.0;
+  return u;
+}
+// 読み上げ所要時間の推定（Web Speechは事前に長さを返さないため文字から概算）
+const MORAE_PER_SEC=7.2;   // 読み上げ速度の目安（調整可）
+function estimateSeconds(t){
+  let m=0;
+  for(const ch of t){
+    if(/[一-鿿㐀-䶿]/.test(ch)) m+=1.8;        // 漢字
+    else if(/[぀-ヿｦ-ﾟ]/.test(ch)) m+=1;     // かな
+    else if(/[0-9A-Za-z]/.test(ch)) m+=0.6;
+    else m+=0.25;                                              // 記号・空白
+  }
+  const rate=parseFloat(rateEl.value)||1;
+  return m/(MORAE_PER_SEC*rate);
+}
+
+let preTimer=null;   // 音声を遅らせるための待機タイマー
+function resetCardsUI(){
+  document.querySelectorAll('.qcard.playing').forEach(c=>c.classList.remove('playing'));
+  document.querySelectorAll('.iact.play.on').forEach(b=>{b.classList.remove('on');const l=b.querySelector('.lbl');if(l)l.textContent='読み上げ';});
+}
+function markCard(cardEl,on){
+  if(!cardEl)return;
+  cardEl.classList.toggle('playing',on);
+  const b=cardEl.querySelector('.iact.play');
+  if(b){b.classList.toggle('on',on);const l=b.querySelector('.lbl');if(l)l.textContent=on?'停止':'読み上げ';}
+}
+function stopAll(){
+  if(preTimer){clearTimeout(preTimer);preTimer=null;}
+  try{speechSynthesis.cancel();}catch(e){}
+  resetCardsUI();
+  setState('idle');
+}
+
+function speak(text,cardEl,id){
+  if(!window.speechSynthesis){return;}
+  const wasPlaying=(playingId===id);
+  stopAll();
+  if(wasPlaying){playingId=null;return;} // 同じものを押したら停止
+
+  playingId=id;
+  const est=estimateSeconds(text);
+  const useLong = est>6;                 // 7秒以上→歩く動画 / 6秒以内→短い動画
+  const vid = useLong ? talkLong : talkShort;
+
+  // 先に映像を出す（発話状態へ）
+  setState('speaking');
+  try{vid.currentTime=0;}catch(e){}
+  showVideo(vid); kick(vid);
+  markCard(cardEl,true);
+
+  const u=makeUtter(text);
+  u.onend=u.onerror=()=>{ playingId=null; markCard(cardEl,false); setState('idle'); };
+
+  if(useLong){
+    speechSynthesis.speak(u);            // 長い→映像と音声を同時に
+  }else{
+    // 短い→動画を先行再生し、音声を約3秒遅らせて開始（動画と音声のラグ調整）
+    preTimer=setTimeout(()=>{ preTimer=null; if(playingId===id) speechSynthesis.speak(u); }, 3000);
+  }
+}
+// try / preview button（本番と同じ出し分けロジックを使用）
+const tryBtn=document.getElementById('tryVoice');
+if(tryBtn)tryBtn.addEventListener('click',()=>{
+  speak('こんにちは！AIやぐちさんです。今日も一緒に、議案をわかりやすく見ていきましょうね！',null,'try');
+});
+
+/* ---------- icons ---------- */
+const IC={
+  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.8V4h6v6.8a2 2 0 0 0 .6 1.4l1.4 1.4V16H7v-2.4l1.4-1.4A2 2 0 0 0 9 10.8z"/></svg>',
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
+};
+
+/* ---------- render ---------- */
+function isPinned(q){return pins.some(p=>p.q===q);}
+function savePins(){try{localStorage.setItem(PIN_KEY,JSON.stringify(pins))}catch(e){}}
+
+function card(item,idx,pinnedCtx){
+  const el=document.createElement('div');
+  el.className='qcard'+(isPinned(item.q)?' pinned':'');
+  el.innerHTML=`
+    <div class="qnum">${pinnedCtx?'📌':(idx+1)}</div>
+    <div class="qbody">
+      <div class="qtext"></div>
+      ${item.note?`<div class="qnote"></div>`:''}
+      <div class="qacts">
+        <button class="iact play" type="button">${IC.play}<span class="lbl">読み上げ</span></button>
+        <button class="iact pinbtn ${isPinned(item.q)?'on':''}" type="button">${IC.pin}<span class="plbl">${isPinned(item.q)?'ストック済み':'ストック'}</span></button>
+        <button class="iact copybtn" type="button">${IC.copy}<span>コピー</span></button>
+      </div>
+    </div>`;
+  el.querySelector('.qtext').textContent=item.q;
+  if(item.note)el.querySelector('.qnote').textContent=item.note;
+  el.querySelector('.play').addEventListener('click',()=>speak(item.q,el,item.id));
+  el.querySelector('.pinbtn').addEventListener('click',()=>togglePin(item));
+  el.querySelector('.copybtn').addEventListener('click',(e)=>{
+    navigator.clipboard&&navigator.clipboard.writeText(item.q);
+    const s=e.currentTarget.querySelector('span');const o=s.textContent;s.textContent='コピー済み';setTimeout(()=>s.textContent=o,1200);
+  });
+  return el;
+}
+
+function renderGen(){
+  const list=document.getElementById('genList');
+  document.getElementById('genCnt').textContent=gen.length?`${gen.length}件`:'';
+  if(!gen.length){return;}
+  list.innerHTML='';
+  gen.forEach((it,i)=>list.appendChild(card(it,i,false)));
+}
+function renderPins(){
+  const sec=document.getElementById('pinSection'),list=document.getElementById('pinList');
+  sec.hidden=!pins.length;
+  document.getElementById('pinCnt').textContent=pins.length?`${pins.length}件`:'';
+  list.innerHTML='';
+  pins.forEach((it,i)=>list.appendChild(card(it,i,true)));
+}
+function togglePin(item){
+  const i=pins.findIndex(p=>p.q===item.q);
+  if(i>=0)pins.splice(i,1); else pins.unshift({id:'pin-'+Date.now()+Math.random().toString(36).slice(2,6),q:item.q,note:item.note||''});
+  savePins();renderPins();renderGen();
+}
+
+/* ---------- generation via claude sample ---------- */
+(async function initSample(){
+  try{ if(window.claude&&claude.use){ sampleFn=await claude.use('sample'); } }catch(e){ sampleFn=null; }
+})();
+
+const genBtn=document.getElementById('gen');
+const errBox=document.getElementById('errBox');
+function showErr(msg){errBox.innerHTML=`<div class="err">${msg}</div>`;}
+function clearErr(){errBox.innerHTML='';}
+
+async function generate(){
+  const text=document.getElementById('agenda').value.trim();
+  clearErr();
+  if(text.length<8){showErr('議案の内容をもう少し詳しく貼り付けてください。');return;}
+  const empty=document.getElementById('emptyState'); if(empty)empty.remove();
+
+  recordChat(text);   // 入力内容を「本システムのチャット履歴」に記録
+
+  genBtn.disabled=true; genBtn.textContent='考えています…'; setState('thinking');
+  const list=document.getElementById('genList');
+  list.innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+
+  if(!sampleFn){
+    setState('idle');genBtn.disabled=false;genBtn.textContent='🔍 素朴な疑問を考えてもらう';
+    list.innerHTML='<div class="empty" id="emptyState"><div class="big">💭</div>この公開版ではAIの自動生成は動きません（AI生成はClaudeアーティファクト版でのみ動作します）。入力内容は「過去の履歴」に記録しました。</div>';
+    clearErr();
+    return;
+  }
+
+  const prompt=
+`あなたは東京都町田市の市議会議員「矢口まゆ」のAI分身、「AIやぐちさん」です。
+市民の代弁者として、以下の議案について、一般の市民が抱きそうな「素朴な疑問」を6つ考えてください。
+
+条件:
+- 専門用語や役所言葉を避け、生活実感にもとづいた、やさしい言葉の質問にする
+- 議員に実際にその場でぶつけられる、具体的で短い質問文にする
+- 「自分の暮らしにどう関係するの?」という視点を大切にする
+- 各質問に、なぜ市民が気になるのかを説明する一言メモ(note、40字以内)を添える
+- 出力は必ず次のJSON形式のみ。前後に文章をつけない:
+{"questions":[{"q":"質問文","note":"一言メモ"}]}
+
+議案の内容:
+${text}`;
+
+  try{
+    const res=await sampleFn.json(prompt,{modelTier:'default',cache:true});
+    let arr=(res&&res.questions)?res.questions:(Array.isArray(res)?res:[]);
+    arr=arr.filter(x=>x&&x.q).map((x,i)=>({id:'g-'+Date.now()+'-'+i,q:String(x.q).trim(),note:x.note?String(x.note).trim():''}));
+    if(!arr.length)throw new Error('empty');
+    gen=arr; renderGen();
+  }catch(err){
+    list.innerHTML='';
+    const code=err&&err.code;
+    if(code==='not_granted')showErr('AI生成の利用が許可されませんでした。ページを開き直して、確認ダイアログで許可してください。');
+    else if(code==='rate_limited')showErr('アクセスが集中しています。少し時間をおいてから、もう一度お試しください。');
+    else showErr('うまく質問を作れませんでした。議案の内容を確認して、もう一度お試しください。');
+  }finally{
+    setState('idle');genBtn.disabled=false;genBtn.textContent='🔍 素朴な疑問を考えてもらう';
+  }
+}
+genBtn.addEventListener('click',generate);
+
+/* ---------- sample agenda presets ---------- */
+const PRESETS=[
+  {t:'例：減債基金条例',v:'財務部 第53号議案 減債基金条例の制定について。市債の償還に必要な財源を確保するため、減債基金を新たに設ける。これまで財政調整基金に積み立てていた、国から交付される臨時財政対策債の元利償還金を、今後はこの減債基金に積み立てるようにする。'},
+  {t:'例：客引き行為の規制',v:'防災安全部 第49号議案（補正予算）。駅前などでの客引き行為について、一定程度商いをする人の行為を制限する条例の制定に向け、予算をとって市民や事業者の意見を聞く。どのような行為を規制対象とするかを検討する。'},
+  {t:'例：教育センター解体',v:'政策経営部 第62号議案。教育センターの解体工事および跡地への子ども・子育てサポート等複合施設の整備事業（債務負担行為、ECI方式）。建物にはアスベストの含有があり、飛散防止のマニュアルに則って解体を進める。'}
+];
+(function(){const box=document.getElementById('presets');
+  PRESETS.forEach(p=>{const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=p.t;
+    b.addEventListener('click',()=>{document.getElementById('agenda').value=p.v;});box.appendChild(b);});
+})();
+
+renderPins();
+
+/* =====================================================================
+   スプレッドシート連携（Google Apps Script 窓口経由）
+   - 読み込み：JSONP（GETのCORS制約を回避）で history / voices を取得
+   - 書き込み：no-cors POST で「チャット履歴」に記録（送信のみ・応答は読まない）
+   ===================================================================== */
+
+// 履歴への記録（入力プロンプトを送信）
+function recordChat(text){
+  if(!gasReady||!text)return;
+  try{
+    fetch(GAS_URL,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'log',text:String(text).slice(0,2000)})});
+  }catch(e){}
+  // 送信後、少し待って一覧を更新
+  setTimeout(loadData,1500);
+}
+
+// JSONP 取得
+function jsonp(url){
+  return new Promise((resolve,reject)=>{
+    const cb='cb_'+Date.now()+'_'+Math.floor(Math.random()*1e6);
+    const s=document.createElement('script');
+    let done=false;
+    window[cb]=(d)=>{done=true;resolve(d);cleanup();};
+    function cleanup(){try{delete window[cb];}catch(e){window[cb]=undefined;} s.remove();}
+    s.onerror=()=>{if(!done){reject(new Error('jsonp_error'));cleanup();}};
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+cb+'&t='+Date.now();
+    document.body.appendChild(s);
+    setTimeout(()=>{if(!done){reject(new Error('jsonp_timeout'));cleanup();}},12000);
+  });
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtTs(s){ if(!s)return''; const d=new Date(s); if(isNaN(d.getTime()))return String(s);
+  const p=n=>('0'+n).slice(-2); return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+
+// 過去の履歴を描画
+function renderHistory(items){
+  const list=document.getElementById('histList');
+  document.getElementById('histCnt').textContent=items.length?`${items.length}件`:'';
+  if(!items.length){list.innerHTML='<div class="empty">まだ履歴がありません。</div>';return;}
+  list.innerHTML='';
+  items.forEach(it=>{
+    const el=document.createElement('div');el.className='histrow';
+    el.innerHTML=`<div class="ht">${esc(fmtTs(it.ts))}</div><div class="hx">${esc(it.text||'')}</div>`;
+    list.appendChild(el);
+  });
+}
+
+// 市民からの声を描画（読み上げ・ストック付きカード）
+let voiceItems=[];
+function renderVoices(items){
+  voiceItems=items.map((it,i)=>({id:'v-'+i+'-'+(it.ts||''),q:String(it.text||'').trim(),note:it.ts?('📅 '+fmtTs(it.ts)):''})).filter(x=>x.q);
+  const list=document.getElementById('voiceList');
+  document.getElementById('voiceCnt').textContent=voiceItems.length?`${voiceItems.length}件`:'';
+  if(!voiceItems.length){list.innerHTML='<div class="empty">まだ市民からの声はありません。</div>';return;}
+  list.innerHTML='';
+  voiceItems.forEach((it,i)=>list.appendChild(card(it,i,false)));
+}
+
+// データ取得（履歴＋市民の声）
+let loadTimer=null;
+async function loadData(){
+  if(!gasReady)return;
+  try{
+    const d=await jsonp(GAS_URL);
+    if(d){ renderHistory(d.history||[]); renderVoices(d.voices||[]); }
+  }catch(e){ /* 取得失敗時は前回表示を維持 */ }
+}
+
+// 未設定なら案内を出す。設定済みなら初回取得＋定期更新。
+(function initData(){
+  if(!gasReady){
+    document.getElementById('histList').innerHTML='<div class="empty">スプレッドシート未接続です。index.html の GAS_URL に Apps Script のURLを設定すると、履歴と市民の声が表示されます。</div>';
+    document.getElementById('voiceList').innerHTML='<div class="empty">スプレッドシート未接続です。</div>';
+    return;
+  }
+  loadData();
+  loadTimer=setInterval(loadData,POLL_MS);
+})();
+</script>
