@@ -146,6 +146,16 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 .datanote{margin:0 14px 6px;font-size:.72rem;color:var(--muted)}
 .datanote.warn{color:var(--coral-deep)}
 .qlist{padding:14px;display:flex;flex-direction:column;gap:12px}
+/* 5件まで表示し、6件目以降はこの枠内でスクロール */
+.qlist.capped{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.qlist.capped::-webkit-scrollbar{width:8px}
+.qlist.capped::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.qlist.capped::-webkit-scrollbar-thumb:hover{background:var(--cyan-glow)}
+/* 市民からの声：日付フィルタ */
+.dayfilterbar{display:flex;align-items:center;gap:8px;padding:12px 14px 0;font-size:.82rem;color:var(--muted)}
+.dayfilter{font-family:inherit;font-size:.85rem;padding:5px 10px;border:1px solid var(--line);
+  border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;max-width:220px}
+.dayfilter:focus{outline:2px solid var(--cyan-glow);outline-offset:1px}
 
 .qcard{border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;background:#fff;
   display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,box-shadow .15s;
@@ -223,14 +233,14 @@ footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;lin
         <textarea id="agenda" placeholder="例）財務部 第53号議案 減債基金条例。償還に必要な財源確保のため減債基金を制定する。臨時財政対策債の元利償還金を積み立てる…"></textarea>
         <div class="presets" id="presets"></div>
         <button class="btn" id="gen">🔍 素朴な疑問を考えてもらう</button>
-        <p class="hint">貼り付けた議案について、AIやぐちさんが「市民が気になりそうな質問」を提案します。気に入った質問は📌でストックしておけます。</p>
+        <p class="hint">貼り付けた議案について、AIやぐちさんが「市民が気になりそうな質問」を提案します。気に入った質問は📌でピン止めしておけます。</p>
       </div>
     </section>
 
     <!-- RIGHT: questions -->
     <div class="qcol">
       <section class="section" id="pinSection" hidden>
-        <h2 class="pin-h">📌 ストックした質問 <span class="cnt" id="pinCnt"></span></h2>
+        <h2 class="pin-h">📌 ピン止めした質問 <span class="cnt" id="pinCnt"></span></h2>
         <div class="qlist" id="pinList"></div>
       </section>
 
@@ -247,6 +257,7 @@ footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;lin
 
       <section class="section">
         <h2 class="voice-h">📣 市民からの声 <span class="cnt" id="voiceCnt"></span></h2>
+        <div class="dayfilterbar">表示する日：<select id="voiceDay" class="dayfilter"></select></div>
         <div class="qlist" id="voiceList">
           <div class="empty" id="voiceEmpty">アンケートから届いた市民の声がここに表示されます。</div>
         </div>
@@ -448,7 +459,7 @@ function card(item,idx,pinnedCtx){
       ${item.note?`<div class="qnote"></div>`:''}
       <div class="qacts">
         <button class="iact play" type="button">${IC.play}<span class="lbl">読み上げ</span></button>
-        <button class="iact pinbtn ${isPinned(item.q)?'on':''}" type="button">${IC.pin}<span class="plbl">${isPinned(item.q)?'ストック済み':'ストック'}</span></button>
+        <button class="iact pinbtn ${isPinned(item.q)?'on':''}" type="button">${IC.pin}<span class="plbl">${isPinned(item.q)?'ピン止め済み':'ピン止め'}</span></button>
         <button class="iact copybtn" type="button">${IC.copy}<span>コピー</span></button>
       </div>
     </div>`;
@@ -463,12 +474,29 @@ function card(item,idx,pinnedCtx){
   return el;
 }
 
+/* リストを最大n件まで表示し、それ以降は枠内スクロール（マウスを乗せてホイール操作） */
+function capList(list,n){
+  n=n||5;
+  if(!list)return;
+  list.classList.remove('capped');
+  list.style.maxHeight='';
+  const kids=Array.prototype.slice.call(list.children).filter(el=>!el.classList.contains('empty'));
+  if(kids.length<=n)return;
+  const listTop=list.getBoundingClientRect().top;
+  const nth=kids[n-1].getBoundingClientRect();
+  const padB=parseFloat(getComputedStyle(list).paddingBottom)||0;
+  const h=Math.ceil(nth.bottom-listTop+padB);
+  list.style.maxHeight=h+'px';
+  list.classList.add('capped');
+}
+
 function renderGen(){
   const list=document.getElementById('genList');
   document.getElementById('genCnt').textContent=gen.length?`${gen.length}件`:'';
   if(!gen.length){return;}
   list.innerHTML='';
   gen.forEach((it,i)=>list.appendChild(card(it,i,false)));
+  capList(list,5);
 }
 function renderPins(){
   const sec=document.getElementById('pinSection'),list=document.getElementById('pinList');
@@ -476,6 +504,7 @@ function renderPins(){
   document.getElementById('pinCnt').textContent=pins.length?`${pins.length}件`:'';
   list.innerHTML='';
   pins.forEach((it,i)=>list.appendChild(card(it,i,true)));
+  if(!sec.hidden)capList(list,5);
 }
 function togglePin(item){
   const i=pins.findIndex(p=>p.q===item.q);
@@ -633,18 +662,48 @@ function renderHistory(items){
     el.innerHTML=`<div class="ht">${esc(fmtTs(it.ts))}</div><div class="hx">${esc(it.text||'')}</div>`;
     list.appendChild(el);
   });
+  capList(list,5);
 }
 
-// 市民からの声を描画（読み上げ・ストック付きカード）
-let voiceItems=[];
-function renderVoices(items){
-  voiceItems=items.map((it,i)=>({id:'v-'+i+'-'+(it.ts||''),q:String(it.text||'').trim(),note:it.ts?('📅 '+fmtTs(it.ts)):''})).filter(x=>x.q);
-  const list=document.getElementById('voiceList');
-  document.getElementById('voiceCnt').textContent=voiceItems.length?`${voiceItems.length}件`:'';
-  if(!voiceItems.length){list.innerHTML='<div class="empty">まだ市民からの声はありません。</div>';return;}
-  list.innerHTML='';
-  voiceItems.forEach((it,i)=>list.appendChild(card(it,i,false)));
+// 市民からの声を描画（読み上げ・ピン止め付きカード。日付で絞り込み可能）
+let voiceAll=[];          // 全件（マップ済み）
+let voiceRaw=[];          // 直近の生データ（フィルタ切替時の再描画用）
+let voiceDayFilter=null;  // null=初期（最新日を既定）／'all'=全期間／'YYYY/MM/DD'
+function dayOf(ts){ return String(ts||'').trim().split(' ')[0]; }
+function todayStr(){ return dayOf(fmtTs(new Date())); }
+function labelDay(d){ return d===todayStr() ? d+'（今日）' : d; }
+function buildVoiceDayOptions(days){
+  const sel=document.getElementById('voiceDay'); if(!sel)return;
+  const cur=voiceDayFilter;
+  sel.innerHTML='';
+  const oAll=document.createElement('option');oAll.value='all';oAll.textContent='全期間';sel.appendChild(oAll);
+  days.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=labelDay(d);sel.appendChild(o);});
+  if(cur && cur!=='all' && days.indexOf(cur)<0){ // 選択中の日が今回無くても選択を保持
+    const o=document.createElement('option');o.value=cur;o.textContent=labelDay(cur);sel.appendChild(o);
+  }
+  sel.value=cur;
 }
+function renderVoices(items){
+  if(items)voiceRaw=items;
+  voiceAll=voiceRaw.map((it,i)=>({id:'v-'+i+'-'+(it.ts||''),q:String(it.text||'').trim(),
+      note:it.ts?('📅 '+fmtTs(it.ts)):'',day:dayOf(it.ts)})).filter(x=>x.q);
+  const days=Array.from(new Set(voiceAll.map(v=>v.day).filter(Boolean))).sort().reverse();
+  if(voiceDayFilter===null) voiceDayFilter = days.length ? days[0] : 'all';  // 既定は最新日
+  buildVoiceDayOptions(days);
+  const shown = (voiceDayFilter==='all') ? voiceAll : voiceAll.filter(v=>v.day===voiceDayFilter);
+  const list=document.getElementById('voiceList');
+  const total=voiceAll.length;
+  document.getElementById('voiceCnt').textContent =
+    !total ? '' : (voiceDayFilter==='all' ? `全${total}件` : `${shown.length}件 / 全${total}件`);
+  if(!total){list.classList.remove('capped');list.style.maxHeight='';list.innerHTML='<div class="empty">まだ市民からの声はありません。</div>';return;}
+  if(!shown.length){list.classList.remove('capped');list.style.maxHeight='';list.innerHTML='<div class="empty">この日の声はまだありません。別の日や「全期間」に切り替えてご覧ください。</div>';return;}
+  list.innerHTML='';
+  shown.forEach((it,i)=>list.appendChild(card(it,i,false)));
+  capList(list,5);
+}
+document.addEventListener('change',function(e){
+  if(e.target && e.target.id==='voiceDay'){ voiceDayFilter=e.target.value; renderVoices(); }
+});
 
 // データ取得（履歴＋市民の声）
 let loadTimer=null;
