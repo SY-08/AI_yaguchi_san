@@ -685,8 +685,13 @@ function buildVoiceDayOptions(days){
 }
 function renderVoices(items){
   if(items)voiceRaw=items;
-  voiceAll=voiceRaw.map((it,i)=>({id:'v-'+i+'-'+(it.ts||''),q:String(it.text||'').trim(),
-      note:it.ts?('📅 '+fmtTs(it.ts)):'',day:dayOf(it.ts)})).filter(x=>x.q);
+  voiceAll=voiceRaw.map((it,i)=>{
+      const loc=[it.pref,it.city].filter(Boolean).join('');
+      const who=[it.nickname,loc,it.age].filter(Boolean).join(' ・ ');
+      const dateStr=it.ts?('📅 '+fmtTs(it.ts)):'';
+      const note=[dateStr, who?('🙋 '+who):''].filter(Boolean).join('　');
+      return {id:'v-'+i+'-'+(it.ts||''),q:String(it.text||'').trim(),note:note,day:dayOf(it.ts)};
+    }).filter(x=>x.q);
   const days=Array.from(new Set(voiceAll.map(v=>v.day).filter(Boolean))).sort().reverse();
   if(voiceDayFilter===null) voiceDayFilter = days.length ? days[0] : 'all';  // 既定は最新日
   buildVoiceDayOptions(days);

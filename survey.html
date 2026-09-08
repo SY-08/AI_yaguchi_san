@@ -89,6 +89,8 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
   font-family:inherit;font-size:1rem;color:var(--ink);background:#fff}
 .field input:focus-visible,.field select:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 .row2{display:flex;gap:10px}.row2 .field{flex:1}
+.privnote{font-size:.8rem;line-height:1.65;color:#8a5a00;background:#fff8e6;
+  border:1px solid #ffe3a3;border-radius:12px;padding:11px 13px}
 
 .confirm-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
 .confirm-box .k{font-size:.72rem;color:var(--muted);margin-top:8px}
@@ -219,6 +221,7 @@ function stepProfile(){
   say('よければ、あなたのことも教えてください。（すべて任意です）');
   const form=document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='12px';
   form.innerHTML=
+    '<div class="privnote">📺 ニックネーム・お住まいの市区町村記入に関しては、YouTube LIVEやYouTube撮影時に画面に投影される場合がございます。あらかじめ御了承の上、ご記入頂けますと幸いです。</div>'+
     '<div class="field"><label>ニックネーム<span class="opt">任意</span></label><input id="pf_nick" type="text" maxlength="30" placeholder="例：まちだ太郎" value="'+esc(st.nickname)+'"></div>'+
     '<div class="row2">'+
       '<div class="field"><label>都道府県<span class="opt">任意</span></label><select id="pf_pref"></select></div>'+
