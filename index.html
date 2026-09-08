@@ -506,8 +506,26 @@ async function generate(){
   list.innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
 
   if(!sampleFn){
+    // Claudeが使えない環境（GitHub版）→ 窓口経由でGeminiに生成させる
+    if(gasReady){
+      clearErr();
+      try{
+        const arr=await genViaGemini(text);
+        if(!arr.length)throw new Error('empty');
+        gen=arr; renderGen();
+      }catch(err){
+        list.innerHTML='';
+        if(err&&err.msg==='no_key')
+          showErr('AI生成の準備がまだ完了していません（GeminiのAPIキー未設定）。設定が終わると使えるようになります。入力内容は「過去の履歴」に記録済みです。');
+        else
+          showErr('うまく質問を作れませんでした。少し時間をおいて、もう一度お試しください。（入力内容は履歴に記録済みです）');
+      }finally{
+        setState('idle');genBtn.disabled=false;genBtn.textContent='🔍 素朴な疑問を考えてもらう';
+      }
+      return;
+    }
     setState('idle');genBtn.disabled=false;genBtn.textContent='🔍 素朴な疑問を考えてもらう';
-    list.innerHTML='<div class="empty" id="emptyState"><div class="big">💭</div>この公開版ではAIの自動生成は動きません（AI生成はClaudeアーティファクト版でのみ動作します）。入力内容は「過去の履歴」に記録しました。</div>';
+    list.innerHTML='<div class="empty" id="emptyState"><div class="big">💭</div>この画面ではAIの自動生成が使えません。入力内容は「過去の履歴」に記録しました。</div>';
     clearErr();
     return;
   }
@@ -544,6 +562,15 @@ ${text}`;
   }
 }
 genBtn.addEventListener('click',generate);
+
+/* 窓口(Apps Script)経由で Gemini に素朴な疑問を生成させる（GitHub版用） */
+async function genViaGemini(text){
+  const url=GAS_URL+(GAS_URL.includes('?')?'&':'?')+'action=generate&agenda='+encodeURIComponent(String(text).slice(0,3000));
+  const d=await jsonp(url);
+  if(d&&d.ok===false&&d.error==='no_key'){const e=new Error('no_key');e.msg='no_key';throw e;}
+  return ((d&&d.questions)||[]).filter(x=>x&&x.q)
+    .map((x,i)=>({id:'g-'+Date.now()+'-'+i,q:String(x.q).trim(),note:x.note?String(x.note).trim():''}));
+}
 
 /* ---------- sample agenda presets ---------- */
 const PRESETS=[
