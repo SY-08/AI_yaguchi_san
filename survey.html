@@ -37,37 +37,31 @@ body{
   display:grid;place-items:center;color:#fff;font-weight:900;font-family:"Zen Maru Gothic";box-shadow:0 5px 12px rgba(10,110,166,.35)}
 .hd .ttl{font-family:"Zen Maru Gothic";font-weight:900;font-size:1.02rem;line-height:1.2}
 .hd .sub{font-size:.68rem;color:var(--ink-soft)}
-.hd .spacer{flex:1}
-.snd{border:1px solid var(--line);background:var(--panel);border-radius:999px;
-  width:38px;height:38px;display:grid;place-items:center;cursor:pointer;font-size:1rem;box-shadow:var(--shadow)}
 
 /* ---- character stage ---- */
 .stage{position:relative;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);
   background:radial-gradient(120% 90% at 50% 18%, #bfe8ff 0%, #7fcbfb 55%, #57b8f2 100%);
-  height:270px;flex:none}
-@media(max-height:720px){.stage{height:210px}}
-.char{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 44%;
-  opacity:0;transition:opacity .35s ease}
-.char.show{opacity:1}
-.frameglow{position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .35s;
+  height:230px;flex:none}
+@media(max-height:740px){.stage{height:190px}}
+.char{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%}
+.frameglow{position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .3s;
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.7),inset 0 0 40px rgba(80,201,242,.5)}
 .stage.speaking .frameglow{opacity:1;animation:pulse 1.05s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-/* speech bubble */
-.bubble{position:absolute;left:14px;right:14px;bottom:14px;z-index:3;background:rgba(255,255,255,.96);
-  border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 6px 16px rgba(16,90,140,.18);
-  font-size:.98rem;line-height:1.55;font-weight:500;min-height:2.6em;
-  animation:rise .3s ease both}
-.bubble:after{content:"";position:absolute;top:-9px;left:40px;width:16px;height:16px;background:inherit;
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* ---- speech bubble (キャラの下・重ならない) ---- */
+.bubble{position:relative;margin:12px 6px 2px;background:var(--panel);
+  border:1px solid var(--line);border-radius:16px;padding:12px 15px;box-shadow:0 6px 16px rgba(16,90,140,.14);
+  font-size:1rem;line-height:1.55;font-weight:500;min-height:2.4em;animation:rise .3s ease both}
+.bubble:after{content:"";position:absolute;top:-8px;left:34px;width:15px;height:15px;background:var(--panel);
   border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
-@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .bubble .nm{font-size:.66rem;color:var(--cyan-deep);font-weight:700;margin-bottom:3px;font-family:"Zen Maru Gothic"}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* progress */
 .prog{display:flex;gap:6px;justify-content:center;padding:12px 0 6px}
 .prog i{width:22px;height:5px;border-radius:3px;background:var(--line);transition:background .2s}
-.prog i.on{background:var(--cyan)}
-.prog i.done{background:var(--cyan-glow)}
+.prog i.on{background:var(--cyan)} .prog i.done{background:var(--cyan-glow)}
 
 /* answer area */
 .ans{flex:1;display:flex;flex-direction:column;gap:10px;padding:4px 2px 0;overflow-y:auto}
@@ -77,7 +71,6 @@ body{
   cursor:pointer;transition:.12s;box-shadow:0 2px 6px rgba(16,90,140,.06)}
 .choice:hover{border-color:var(--cyan);color:var(--cyan-deep)}
 .choice:active{transform:translateY(1px)}
-.choice.sub{font-size:.9rem;font-weight:500;color:var(--ink-soft);padding:11px 15px}
 
 textarea{width:100%;min-height:120px;resize:vertical;border:1.5px solid var(--line);border-radius:14px;
   padding:13px;font-family:inherit;font-size:1rem;line-height:1.6;color:var(--ink);background:#fff}
@@ -87,6 +80,15 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 .exchip{font-size:.78rem;border:1px dashed var(--line);background:#fff;color:var(--ink-soft);
   border-radius:999px;padding:7px 12px;cursor:pointer;font-family:inherit}
 .exchip:hover{border-color:var(--cyan);color:var(--cyan-deep)}
+
+/* profile form */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:.8rem;font-weight:700;color:var(--ink-soft)}
+.field .opt{font-size:.68rem;color:var(--muted);font-weight:400;margin-left:4px}
+.field input,.field select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px;
+  font-family:inherit;font-size:1rem;color:var(--ink);background:#fff}
+.field input:focus-visible,.field select:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
+.row2{display:flex;gap:10px}.row2 .field{flex:1}
 
 .confirm-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
 .confirm-box .k{font-size:.72rem;color:var(--muted);margin-top:8px}
@@ -98,8 +100,7 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 .btn{flex:1;appearance:none;border:none;cursor:pointer;font-family:"Zen Maru Gothic";font-weight:700;
   border-radius:14px;padding:15px;font-size:1.02rem;color:#fff;
   background:linear-gradient(150deg,var(--cyan-glow),var(--cyan-deep));box-shadow:0 8px 18px rgba(10,110,166,.32);transition:.12s}
-.btn:hover{transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
+.btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(0)}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .btn.ghost{flex:0 0 auto;background:var(--panel);color:var(--ink-soft);border:1.5px solid var(--line);box-shadow:none;padding:15px 18px}
 .note{font-size:.7rem;color:var(--muted);text-align:center;padding:8px 6px 0;line-height:1.5}
@@ -122,20 +123,19 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
       <div class="ttl">市民の声アンケート</div>
       <div class="sub">町田市議会 矢口まゆ ｜ AIやぐちさん</div>
     </div>
-    <div class="spacer"></div>
-    <button class="snd" id="sndBtn" title="音声のオン／オフ" aria-label="音声のオン／オフ">🔊</button>
   </div>
 
   <!-- character -->
   <div class="stage" id="stage" aria-label="AIやぐちさん">
-    <video class="char show" id="charVid" autoplay loop muted playsinline preload="auto"><source src="stand.mp4" type="video/mp4"></video>
+    <video class="char" id="charVid" autoplay loop muted playsinline preload="auto"><source src="stand.mp4" type="video/mp4"></video>
     <div class="frameglow" aria-hidden="true"></div>
-    <div class="bubble" id="bubble"><div class="nm">AIやぐちさん</div><div id="bubbleText">…</div></div>
   </div>
+
+  <!-- speech bubble：キャラの下 -->
+  <div class="bubble" id="bubble"><div class="nm">AIやぐちさん</div><div id="bubbleText">…</div></div>
 
   <div class="prog" id="prog" aria-hidden="true"></div>
 
-  <!-- answer area (steps rendered here) -->
   <div class="ans" id="ans"></div>
 
   <div class="foot" id="foot"></div>
@@ -155,71 +155,44 @@ const EXAMPLES = {
   '環境・ごみ・美化':['ごみの分別ルールが分かりにくい','公園の管理をよくしてほしい','ポイ捨てが多い場所がある'],
   'まちづくり・その他':['駅前をもっと便利にしてほしい','市の予算の使い道が知りたい','イベントや情報発信について']
 };
-const ERAS = ['10代','20代','30代','40代','50代','60代','70代以上','答えない'];
+const PREFS = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+const AGES = ['10歳未満','10〜14歳','15〜19歳','20〜24歳','25〜29歳','30〜34歳','35〜39歳','40〜44歳','45〜49歳','50〜54歳','55〜59歳','60〜64歳','65〜69歳','70〜74歳','75〜79歳','80歳以上'];
 
 /* ===== state ===== */
-const st = { step:0, category:'', text:'', era:'', sound:true };
-const TOTAL = 3; // category, free-text, era（確認・完了は進捗に含めない）
+const st = { step:0, category:'', text:'', nickname:'', pref:'', city:'', age:'' };
+const TOTAL = 3; // 分野・自由記述・プロフィール（確認/完了は含めない）
 
 /* ===== elements ===== */
-const stage=document.getElementById('stage');
-const charVid=document.getElementById('charVid');
+const stage=document.getElementById('stage'), charVid=document.getElementById('charVid');
 const bubble=document.getElementById('bubble'), bubbleText=document.getElementById('bubbleText');
 const ansEl=document.getElementById('ans'), footEl=document.getElementById('foot'), progEl=document.getElementById('prog');
-const noteEl=document.getElementById('note'), sndBtn=document.getElementById('sndBtn');
+const noteEl=document.getElementById('note');
 
-/* ===== character video ===== */
-function kick(v){ try{const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){} }
-kick(charVid);
-document.addEventListener('click',()=>kick(charVid),{once:true});
-// 動画は常時ループ。話している間はフレームを光らせる演出のみ。
-function showTalk(on){ stage.classList.toggle('speaking',on); kick(charVid); }
-
-/* ===== voice (cute female JA) ===== */
-let voices=[], chosen=null;
-function loadVoices(){
-  voices=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>/ja|JP/i.test(v.lang));
-  if(!voices.length)return;
-  voices.sort((a,b)=>score(b)-score(a)); chosen=voices[0];
+/* ===== character video（常時ループ・音声なし） ===== */
+function kick(){ try{const p=charVid.play();if(p&&p.catch)p.catch(()=>{});}catch(e){} }
+kick(); document.addEventListener('click',kick,{once:true});
+let glowTimer=null;
+function say(text){
+  bubble.style.animation='none'; void bubble.offsetWidth; bubble.style.animation='';
+  bubbleText.textContent=text;
+  stage.classList.add('speaking'); clearTimeout(glowTimer);
+  glowTimer=setTimeout(()=>stage.classList.remove('speaking'),1400);
 }
-function score(v){const n=v.name.toLowerCase();let s=0;if(/google/.test(n))s+=5;if(/(女|female|nanami|haruka|sayaka|ayumi|kyoko|mizuki|kaori)/.test(n))s+=3;if(/(male|男|otoya|ichiro)/.test(n))s-=6;return s;}
-if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
-let speakTimer=null;
-function speak(text){
-  if(!st.sound||!window.speechSynthesis){showTalk(true);clearTimeout(speakTimer);speakTimer=setTimeout(()=>showTalk(false),Math.min(6000,1200+text.length*90));return;}
-  try{speechSynthesis.cancel();}catch(e){}
-  const u=new SpeechSynthesisUtterance(text.replace(/[（(].*?[)）]/g,''));
-  if(chosen)u.voice=chosen; u.lang='ja-JP'; u.pitch=1.5; u.rate=1.02;
-  u.onstart=()=>showTalk(true); u.onend=u.onerror=()=>showTalk(false);
-  speechSynthesis.speak(u);
-}
-function say(text){ bubble.style.animation='none'; void bubble.offsetWidth; bubble.style.animation='';
-  bubbleText.textContent=text; speak(text); }
-
-sndBtn.addEventListener('click',()=>{ st.sound=!st.sound; sndBtn.textContent=st.sound?'🔊':'🔇';
-  if(!st.sound){try{speechSynthesis.cancel();}catch(e){}} });
 
 /* ===== progress ===== */
-function renderProg(){
-  progEl.innerHTML='';
-  for(let i=0;i<TOTAL;i++){const el=document.createElement('i');
-    if(i<st.step)el.className='done'; else if(i===st.step)el.className='on'; progEl.appendChild(el);}
-}
-
-/* ===== render helpers ===== */
-function clear(){ ansEl.innerHTML=''; footEl.innerHTML=''; }
+function renderProg(){progEl.innerHTML='';for(let i=0;i<TOTAL;i++){const el=document.createElement('i');
+  if(i<st.step)el.className='done';else if(i===st.step)el.className='on';progEl.appendChild(el);}}
+function clear(){ansEl.innerHTML='';footEl.innerHTML='';}
 function footBtn(label,onClick,opts){opts=opts||{};const b=document.createElement('button');
   b.className='btn'+(opts.ghost?' ghost':'');b.textContent=label;b.onclick=onClick;if(opts.id)b.id=opts.id;footEl.appendChild(b);return b;}
 
 /* ===== steps ===== */
-function start(){ // intro
-  progEl.setAttribute('aria-hidden','true'); progEl.innerHTML='';
-  clear();
+function start(){
+  progEl.innerHTML=''; clear();
   say('こんにちは！AIやぐちさんです。町田のまちについて、あなたの声を聞かせてください。1〜2分で終わります。');
-  footBtn('はじめる 🎤', ()=>{ st.step=0; renderProg(); stepCategory(); });
+  footBtn('はじめる 🎤',()=>{ st.step=0; stepCategory(); });
   noteEl.hidden=false;
 }
-
 function stepCategory(){
   clear(); renderProg();
   say('まず、どんな分野のことですか？近いものを選んでね。');
@@ -228,95 +201,96 @@ function stepCategory(){
     b.onclick=()=>{st.category=c;st.step=1;stepText();};wrap.appendChild(b);});
   ansEl.appendChild(wrap);
 }
-
 function stepText(){
   clear(); renderProg();
   say('「'+st.category+'」について、矢口議員に聞きたいこと・気になっていること・ご意見を教えてください。');
-  const ta=document.createElement('textarea'); ta.id='voiceText'; ta.placeholder='ここに自由にご記入ください。';
-  ta.value=st.text||''; ansEl.appendChild(ta);
+  const ta=document.createElement('textarea'); ta.placeholder='ここに自由にご記入ください。'; ta.value=st.text||'';
+  ansEl.appendChild(ta);
   const lb=document.createElement('div'); lb.className='exlabel'; lb.textContent='▼ こんな感じでOK（タップで入れられます）'; ansEl.appendChild(lb);
   const chips=document.createElement('div'); chips.className='exchips';
   (EXAMPLES[st.category]||[]).forEach(ex=>{const c=document.createElement('button');c.className='exchip';c.type='button';c.textContent=ex;
-    c.onclick=()=>{ ta.value = ta.value.trim()? (ta.value.trim()+'\n'+ex) : ex; ta.focus(); };chips.appendChild(c);});
+    c.onclick=()=>{ta.value=ta.value.trim()?(ta.value.trim()+'\n'+ex):ex;ta.focus();};chips.appendChild(c);});
   ansEl.appendChild(chips);
   footBtn('もどる',()=>{st.step=0;stepCategory();},{ghost:true});
-  const next=footBtn('次へ',()=>{ const v=ta.value.trim(); if(v.length<2){ta.focus();return;} st.text=v; st.step=2; stepEra(); });
+  footBtn('次へ',()=>{const v=ta.value.trim();if(v.length<2){ta.focus();return;}st.text=v;st.step=2;stepProfile();});
 }
-
-function stepEra(){
+function stepProfile(){
   clear(); renderProg();
-  say('よければ、年代を教えてください。（任意です）');
-  const wrap=document.createElement('div'); wrap.className='choices';
-  ERAS.forEach(e=>{const b=document.createElement('button');b.className='choice sub';b.textContent=e;
-    b.onclick=()=>{st.era=(e==='答えない'?'':e);stepConfirm();};wrap.appendChild(b);});
-  ansEl.appendChild(wrap);
+  say('よければ、あなたのことも教えてください。（すべて任意です）');
+  const form=document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='12px';
+  form.innerHTML=
+    '<div class="field"><label>ニックネーム<span class="opt">任意</span></label><input id="pf_nick" type="text" maxlength="30" placeholder="例：まちだ太郎" value="'+esc(st.nickname)+'"></div>'+
+    '<div class="row2">'+
+      '<div class="field"><label>都道府県<span class="opt">任意</span></label><select id="pf_pref"></select></div>'+
+      '<div class="field"><label>市区町村<span class="opt">任意</span></label><input id="pf_city" type="text" maxlength="30" placeholder="例：町田市" value="'+esc(st.city)+'"></div>'+
+    '</div>'+
+    '<div class="field"><label>年齢<span class="opt">任意</span></label><select id="pf_age"></select></div>';
+  ansEl.appendChild(form);
+  const prefSel=form.querySelector('#pf_pref'); prefSel.innerHTML='<option value="">選択しない</option>'+PREFS.map(p=>'<option'+(p===st.pref?' selected':'')+'>'+p+'</option>').join('');
+  const ageSel=form.querySelector('#pf_age'); ageSel.innerHTML='<option value="">選択しない</option>'+AGES.map(a=>'<option'+(a===st.age?' selected':'')+'>'+a+'</option>').join('');
   footBtn('もどる',()=>{st.step=1;stepText();},{ghost:true});
+  footBtn('確認へ',()=>{
+    st.nickname=form.querySelector('#pf_nick').value.trim();
+    st.pref=prefSel.value; st.city=form.querySelector('#pf_city').value.trim(); st.age=ageSel.value;
+    stepConfirm();
+  });
 }
-
 function stepConfirm(){
   clear(); progEl.innerHTML='';
   say('内容を確認してね。これで送ってよければ「送信する」を押してください。');
+  const rows=[['分野',st.category],['あなたの声',st.text]];
+  if(st.nickname)rows.push(['ニックネーム',st.nickname]);
+  const loc=[st.pref,st.city].filter(Boolean).join(' ');
+  if(loc)rows.push(['お住まい',loc]);
+  if(st.age)rows.push(['年齢',st.age]);
   const box=document.createElement('div'); box.className='confirm-box';
-  box.innerHTML='<div class="k">分野</div><div class="v"></div><div class="k">あなたの声</div><div class="v"></div>'+
-    (st.era?'<div class="k">年代</div><div class="v"></div>':'');
-  const vs=box.querySelectorAll('.v'); vs[0].textContent=st.category; vs[1].textContent=st.text; if(st.era)vs[2].textContent=st.era;
+  box.innerHTML=rows.map(r=>'<div class="k">'+esc(r[0])+'</div><div class="v">'+esc(r[1])+'</div>').join('');
   ansEl.appendChild(box);
   const errBox=document.createElement('div'); errBox.id='errBox'; ansEl.appendChild(errBox);
-  footBtn('もどる',()=>{st.step=2;stepEra();},{ghost:true});
-  const send=footBtn('送信する 📨',()=>submit(send,errBox),{id:'sendBtn'});
+  footBtn('もどる',()=>{st.step=2;stepProfile();},{ghost:true});
+  footBtn('送信する 📨',(e)=>submit(e.currentTarget,errBox));
 }
-
 async function submit(btn,errBox){
-  errBox.innerHTML='';
-  btn.disabled=true; btn.textContent='送信中…';
-  const displayText = '【'+st.category+'】'+st.text;
-  const ok = await postVoice({action:'voice', text:displayText, category:st.category, era:st.era});
-  if(ok){ stepThanks(); }
-  else{ btn.disabled=false; btn.textContent='送信する 📨';
-    errBox.innerHTML='<div class="err">送信できませんでした。通信環境を確認して、もう一度お試しください。</div>'; }
+  errBox.innerHTML=''; btn.disabled=true; btn.textContent='送信中…';
+  const displayText='【'+st.category+'】'+st.text;
+  const ok=await postVoice({action:'voice',text:displayText,category:st.category,nickname:st.nickname,pref:st.pref,city:st.city,age:st.age});
+  if(ok){stepThanks();}
+  else{btn.disabled=false;btn.textContent='送信する 📨';
+    errBox.innerHTML='<div class="err">送信できませんでした。通信環境を確認して、もう一度お試しください。</div>';}
+}
+function stepThanks(){
+  clear(); progEl.innerHTML=''; noteEl.hidden=true;
+  say('ありがとうございました！あなたの声、しっかり届けますね。');
+  const t=document.createElement('div'); t.className='thanks';
+  t.innerHTML='<div class="big">🌸</div><h2>送信しました！</h2><p>ご協力ありがとうございました。<br>いただいた声は、矢口議員の活動の参考にさせていただきます。</p>';
+  ansEl.appendChild(t);
+  footBtn('もう一度回答する',()=>{Object.assign(st,{step:0,category:'',text:'',nickname:'',pref:'',city:'',age:''});start();},{ghost:true});
 }
 
-// no-cors POST は結果が読めないため、確認用の GET(JSONP) で件数増加を検知する
+/* ===== 送信（no-cors POST → JSONP GET で件数増加を確認） ===== */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function postVoice(payload){
   return new Promise(async (resolve)=>{
-    let before=-1;
-    try{ before=(await fetchVoices()).length; }catch(e){ before=-1; }
-    try{
-      await fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-    }catch(e){}
-    // 追記の反映を数回確認（最大約9秒）
+    let before=-1; try{before=(await fetchVoices()).length;}catch(e){before=-1;}
+    try{await fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(e){}
     let tries=0;
-    const iv=setInterval(async ()=>{
-      tries++;
-      let now=-1; try{ now=(await fetchVoices()).length; }catch(e){}
-      if(before>=0 && now>before){ clearInterval(iv); resolve(true); return; }
-      if(tries>=6){ clearInterval(iv); resolve(before<0?true:false); } // 件数取得不可なら成功扱い
+    const iv=setInterval(async ()=>{tries++;let now=-1;try{now=(await fetchVoices()).length;}catch(e){}
+      if(before>=0&&now>before){clearInterval(iv);resolve(true);return;}
+      if(tries>=6){clearInterval(iv);resolve(before<0?true:false);}
     },1500);
   });
 }
 function fetchVoices(){
   return new Promise((res,rej)=>{
-    const cb='vc_'+Date.now()+Math.floor(Math.random()*1e6);
-    const s=document.createElement('script');let done=false;
+    const cb='vc_'+Date.now()+Math.floor(Math.random()*1e6);const s=document.createElement('script');let done=false;
     window[cb]=(d)=>{done=true;res((d&&d.voices)||[]);cleanup();};
     function cleanup(){try{delete window[cb];}catch(e){}s.remove();}
     s.onerror=()=>{if(!done){rej();cleanup();}};
     s.src=GAS_URL+(GAS_URL.includes('?')?'&':'?')+'callback='+cb+'&t='+Date.now();
-    document.body.appendChild(s); setTimeout(()=>{if(!done){rej();cleanup();}},8000);
+    document.body.appendChild(s);setTimeout(()=>{if(!done){rej();cleanup();}},8000);
   });
 }
 
-function stepThanks(){
-  clear(); progEl.innerHTML=''; noteEl.hidden=true;
-  say('ありがとうございました！あなたの声、しっかり届けますね。');
-  const t=document.createElement('div'); t.className='thanks';
-  t.innerHTML='<div class="big">🌸</div><h2>送信しました！</h2>'+
-    '<p>ご協力ありがとうございました。<br>いただいた声は、矢口議員の活動の参考にさせていただきます。</p>';
-  ansEl.appendChild(t);
-  footBtn('もう一度回答する',()=>{ st.category='';st.text='';st.era='';st.step=0; start(); },{ghost:true});
-}
-
-/* ===== go ===== */
 start();
 </script>
 </body>
