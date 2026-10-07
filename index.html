@@ -167,7 +167,7 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
   font-family:"Zen Maru Gothic";font-weight:900;font-size:.82rem;display:grid;place-items:center}
 .qcard.pinned .qnum{background:var(--coral-soft);color:var(--coral-deep)}
 .qbody{flex:1;min-width:0}
-.qtext{font-size:.96rem;line-height:1.55;font-weight:500;color:var(--ink)}
+.qtext{font-size:.96rem;line-height:1.55;font-weight:500;color:var(--ink);white-space:pre-wrap;word-break:break-word}
 .qnote{font-size:.76rem;color:var(--muted);margin-top:6px;line-height:1.5;
   padding-left:10px;border-left:2px solid var(--line)}
 .qacts{display:flex;gap:7px;margin-top:11px}
@@ -690,7 +690,11 @@ function renderVoices(items){
       const who=[it.nickname,loc,it.age].filter(Boolean).join(' ・ ');
       const dateStr=it.ts?('📅 '+fmtTs(it.ts)):'';
       const note=[dateStr, who?('🙋 '+who):''].filter(Boolean).join('　');
-      return {id:'v-'+i+'-'+(it.ts||''),q:String(it.text||'').trim(),note:note,day:dayOf(it.ts)};
+      // アンケートの「具体的な内容」（任意欄）があれば、声の本文の下に続けて表示・読み上げ
+      const body=String(it.text||'').trim();
+      const detail=String(it.detail||'').trim();
+      const q=body&&detail ? body+'\n📍 具体的には：'+detail : body;
+      return {id:'v-'+i+'-'+(it.ts||''),q:q,note:note,day:dayOf(it.ts)};
     }).filter(x=>x.q);
   const days=Array.from(new Set(voiceAll.map(v=>v.day).filter(Boolean))).sort().reverse();
   if(voiceDayFilter===null) voiceDayFilter = days.length ? days[0] : 'all';  // 既定は最新日
