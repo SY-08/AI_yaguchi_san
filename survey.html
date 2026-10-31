@@ -86,7 +86,14 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 .detail label{display:block;font-size:.84rem;font-weight:700;color:var(--ink);margin-bottom:4px}
 .detail .opt{font-size:.68rem;color:var(--muted);font-weight:400;margin-left:4px}
 .detail .hint{font-size:.76rem;line-height:1.6;color:var(--ink-soft);margin:0 0 8px}
-.detail textarea{min-height:92px;font-size:.95rem}
+.detail .dfields{display:flex;flex-direction:column;gap:9px}
+.detail .dfield{display:flex;flex-direction:column;gap:4px}
+.detail .dfield span{font-size:.78rem;font-weight:700;color:var(--cyan-deep)}
+.detail .dfield span small{font-weight:400;color:var(--muted);margin-left:4px}
+.detail input,.detail textarea{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;
+  font-family:inherit;font-size:.95rem;line-height:1.5;color:var(--ink);background:#fff}
+.detail textarea{min-height:64px;resize:vertical}
+.detail input:focus-visible,.detail textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 
 /* profile form */
 .field{display:flex;flex-direction:column;gap:5px}
@@ -164,20 +171,23 @@ const EXAMPLES = {
   '環境・ごみ・美化':['ごみの分別ルールが分かりにくい','公園の管理をよくしてほしい','ポイ捨てが多い場所がある'],
   'まちづくり・その他':['駅前をもっと便利にしてほしい','市の予算の使い道が知りたい','イベントや情報発信について']
 };
-/* 具体化欄の記入例（分野ごと）。あくまで例示で、自由記述です */
+/* 具体化欄（どこの／何が原因で／いつ頃から）の記入例。あくまで例示で、自由記述です */
 const DETAIL_EX = {
-  '子育て・教育':'例）場所：○○小学校の通学路／困っていること：放課後に子どもが遊べる場所がない／いつ頃から：今年の春から',
-  '防災・安全':'例）場所：○○町○丁目の○○公園の横の道／状況：街灯が少なく夜は真っ暗／気づいたきっかけ：帰宅時にいつも不安',
-  '道路・交通':'例）場所：○○駅行きのバス（○○停留所）／状況：朝7〜8時台は満員で乗れない／頻度：ほぼ毎日',
-  '福祉・医療':'例）対象：一人暮らしの高齢の親／困っていること：どこに相談すればよいか分からない／地域：○○町',
-  '環境・ごみ・美化':'例）場所：○○町の○○公園／状況：草が伸び放題で遊具が使えない、ごみが放置されている／いつ頃から：この夏から',
-  'まちづくり・その他':'例）場所：○○駅の北口／困っていること：駐輪場が足りず歩道に自転車があふれている／時間帯：平日の朝'
+  '子育て・教育':{where:'例）○○小学校の通学路、○○町の児童館',why:'例）放課後に子どもが安心して遊べる場所がない',when:'例）今年の春から'},
+  '防災・安全':{where:'例）○○町○丁目の○○公園の横の道',why:'例）街灯が少なく、夜は真っ暗で人通りもない',when:'例）昨年の秋ごろから'},
+  '道路・交通':{where:'例）○○駅行きのバス（○○停留所）',why:'例）朝7〜8時台は満員で乗れないことが多い',when:'例）ダイヤ改正の後から'},
+  '福祉・医療':{where:'例）○○町、近くの○○クリニック',why:'例）一人暮らしの高齢の親の相談先が分からない',when:'例）半年ほど前から'},
+  '環境・ごみ・美化':{where:'例）○○町の○○公園',why:'例）草が伸び放題で遊具が使えない／ごみが放置されている',when:'例）この夏から'},
+  'まちづくり・その他':{where:'例）○○駅の北口',why:'例）駐輪場が足りず、歩道に自転車があふれている',when:'例）駅前の工事が始まってから'}
 };
+const DETAIL_PARTS=[['where','どこの？','場所・施設名など'],['why','何が原因で？','状況・困っていること'],['when','いつ頃から？','時期・頻度など']];
+const DETAIL_LABEL={where:'どこ',why:'原因・状況',when:'いつ頃から'};
+function detailText(){return DETAIL_PARTS.map(([k])=>st.d[k]?DETAIL_LABEL[k]+'：'+st.d[k]:'').filter(Boolean).join('／');}
 const PREFS = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
 const AGES = ['10歳未満','10〜14歳','15〜19歳','20〜24歳','25〜29歳','30〜34歳','35〜39歳','40〜44歳','45〜49歳','50〜54歳','55〜59歳','60〜64歳','65〜69歳','70〜74歳','75〜79歳','80歳以上'];
 
 /* ===== state ===== */
-const st = { step:0, category:'', text:'', detail:'', nickname:'', pref:'', city:'', age:'' };
+const st = { step:0, category:'', text:'', d:{where:'',why:'',when:''}, nickname:'', pref:'', city:'', age:'' };
 const TOTAL = 3; // 分野・自由記述・プロフィール（確認/完了は含めない）
 
 /* ===== elements ===== */
@@ -231,13 +241,22 @@ function stepText(){
   ansEl.appendChild(chips);
   // 具体化欄（任意・自由記述）：どこで・何が・いつから等を書いてもらい、課題を特定しやすくする
   const dt=document.createElement('div'); dt.className='detail';
-  dt.innerHTML='<label for="detailTa">もう少し具体的に教えてください<span class="opt">任意</span></label>'+
-    '<p class="hint">「どこの」「何が原因で」「いつ頃から」など、より具体的にご記入いただくことで、問題解決に向けたプロセスを進めやすくなります。分かる範囲で、自由にお書きください。</p>';
-  const dta=document.createElement('textarea'); dta.id='detailTa'; dta.maxLength=1000;
-  dta.placeholder=DETAIL_EX[st.category]||'例）場所：○○町の○○／状況：○○／いつ頃から：○○'; dta.value=st.detail||'';
-  dt.appendChild(dta); ansEl.appendChild(dt);
-  footBtn('もどる',()=>{st.detail=dta.value.trim();st.step=0;stepCategory();},{ghost:true});
-  footBtn('次へ',()=>{const v=ta.value.trim();if(v.length<2){ta.focus();return;}st.text=v;st.detail=dta.value.trim();st.step=2;stepProfile();});
+  dt.innerHTML='<label>もう少し具体的に教えてください<span class="opt">任意</span></label>'+
+    '<p class="hint">「どこの」「何が原因で」「いつ頃から」など、より具体的にご記入いただくことで、問題解決に向けたプロセスを進めやすくなります。分かる範囲で、書けるところだけ自由にお書きください。</p>';
+  const ex=DETAIL_EX[st.category]||{where:'例）○○町の○○',why:'例）○○で困っている',when:'例）○○頃から'};
+  const fields=document.createElement('div'); fields.className='dfields';
+  const inputs={};
+  DETAIL_PARTS.forEach(([k,lbl,sub])=>{
+    const f=document.createElement('label'); f.className='dfield';
+    const sp=document.createElement('span'); sp.textContent=lbl; const sm=document.createElement('small'); sm.textContent=sub; sp.appendChild(sm);
+    const inp=document.createElement(k==='why'?'textarea':'input'); if(k!=='why')inp.type='text';
+    inp.maxLength=300; inp.placeholder=ex[k]||''; inp.value=st.d[k]||''; inp.id='d_'+k;
+    f.appendChild(sp); f.appendChild(inp); fields.appendChild(f); inputs[k]=inp;
+  });
+  dt.appendChild(fields); ansEl.appendChild(dt);
+  const saveD=()=>{Object.keys(inputs).forEach(k=>{st.d[k]=inputs[k].value.trim();});};
+  footBtn('もどる',()=>{saveD();st.step=0;stepCategory();},{ghost:true});
+  footBtn('次へ',()=>{const v=ta.value.trim();if(v.length<2){ta.focus();return;}st.text=v;saveD();st.step=2;stepProfile();});
 }
 function stepProfile(){
   clear(); renderProg();
@@ -265,7 +284,7 @@ function stepConfirm(){
   clear(); progEl.innerHTML='';
   say('内容を確認してね。これで送ってよければ「送信する」を押してください。');
   const rows=[['分野',st.category],['あなたの声',st.text]];
-  if(st.detail)rows.push(['具体的な内容',st.detail]);
+  DETAIL_PARTS.forEach(([k,lbl])=>{if(st.d[k])rows.push([lbl,st.d[k]]);});
   if(st.nickname)rows.push(['ニックネーム',st.nickname]);
   const loc=[st.pref,st.city].filter(Boolean).join(' ');
   if(loc)rows.push(['お住まい',loc]);
@@ -280,7 +299,7 @@ function stepConfirm(){
 async function submit(btn,errBox){
   errBox.innerHTML=''; btn.disabled=true; btn.textContent='送信中…';
   const displayText='【'+st.category+'】'+st.text;
-  const ok=await postVoice({action:'voice',text:displayText,category:st.category,detail:st.detail,nickname:st.nickname,pref:st.pref,city:st.city,age:st.age});
+  const ok=await postVoice({action:'voice',text:displayText,category:st.category,detail:detailText(),nickname:st.nickname,pref:st.pref,city:st.city,age:st.age});
   if(ok){stepThanks();}
   else{btn.disabled=false;btn.textContent='送信する 📨';
     errBox.innerHTML='<div class="err">送信できませんでした。通信環境を確認して、もう一度お試しください。</div>';}
@@ -291,7 +310,7 @@ function stepThanks(){
   const t=document.createElement('div'); t.className='thanks';
   t.innerHTML='<div class="big">🌸</div><h2>送信しました！</h2><p>ご協力ありがとうございました。<br>いただいた声は、矢口議員の活動の参考にさせていただきます。</p>';
   ansEl.appendChild(t);
-  footBtn('もう一度回答する',()=>{Object.assign(st,{step:0,category:'',text:'',detail:'',nickname:'',pref:'',city:'',age:''});start();},{ghost:true});
+  footBtn('もう一度回答する',()=>{Object.assign(st,{step:0,category:'',text:'',d:{where:'',why:'',when:''},nickname:'',pref:'',city:'',age:''});start();},{ghost:true});
 }
 
 /* ===== 送信（no-cors POST → JSONP GET で件数増加を確認） ===== */

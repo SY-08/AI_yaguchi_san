@@ -180,6 +180,46 @@ textarea:focus-visible{outline:2px solid var(--cyan);border-color:var(--cyan)}
 .iact svg{width:14px;height:14px}
 
 .empty{padding:34px 22px;text-align:center;color:var(--muted);font-size:.86rem;line-height:1.7}
+/* 市民からの声：具体的な内容 */
+.qdetail{margin-top:8px;background:#f2fbf6;border:1px solid #cdeedd;border-radius:10px;padding:8px 11px;
+  font-size:.86rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.qdetail b{display:block;font-size:.72rem;color:#1a8a5f;margin-bottom:2px}
+/* 折りたたみ見出し（過去の履歴） */
+.qlist[hidden]{display:none !important}
+.fold-h{cursor:pointer;user-select:none}
+.fold-h:focus-visible{outline:2px solid var(--cyan-glow);outline-offset:-2px}
+.fold-h[aria-expanded="false"]{border-bottom-color:transparent}
+.fold-ic{display:inline-block;color:var(--muted);font-size:.78rem;transition:transform .15s}
+.fold-h[aria-expanded="true"] .fold-ic{transform:rotate(90deg)}
+.fold-tip{font-size:.7rem;color:var(--muted);font-weight:500;font-family:"Noto Sans JP"}
+.hdel{margin-left:auto;flex:none;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:8px;
+  font-family:inherit;font-size:.72rem;padding:4px 9px;cursor:pointer;white-space:nowrap}
+.hdel:hover{border-color:var(--coral);color:var(--coral-deep)}
+.hdel.armed{background:var(--coral);border-color:var(--coral);color:#fff}
+/* 町田市議会の議案 */
+.gian-h{background:linear-gradient(180deg,#fff,#f5f6ff) !important}
+.gian-src{margin-left:auto;font-size:.72rem}
+.gian-src a{color:var(--cyan-deep)}
+.gcard{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:#fff;animation:rise .35s ease both}
+.ghead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.gno{font-size:.74rem;font-weight:700;color:#4a55a8;background:#eef0ff;border-radius:7px;padding:3px 8px}
+.gres{font-size:.72rem;font-weight:700;border-radius:7px;padding:3px 8px;background:#e6f7ef;color:#1a8a5f}
+.gres.ng{background:var(--coral-soft);color:var(--coral-deep)}
+.gtitle{font-size:.96rem;font-weight:700;line-height:1.5;margin-top:7px;color:var(--ink)}
+.gsum{font-size:.82rem;line-height:1.6;color:var(--ink-soft);margin-top:4px}
+.gmeta{font-size:.72rem;color:var(--muted);margin-top:6px}
+.gqs-h{font-size:.78rem;font-weight:700;color:var(--cyan-deep);margin:10px 0 6px}
+.gqs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;counter-reset:gq}
+.gqs li{display:flex;align-items:flex-start;gap:8px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:10px;padding:7px 9px;counter-increment:gq}
+.gqs li::before{content:counter(gq);flex:none;width:20px;height:20px;border-radius:6px;background:var(--sky-1);
+  color:var(--cyan-deep);font-size:.7rem;font-weight:900;display:grid;place-items:center;margin-top:1px}
+.gqs li.playing{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(79,201,242,.25)}
+.gq{flex:1;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.gqa{display:flex;gap:4px;flex:none}
+.gqa .iact{padding:4px 7px}
+.gqa .iact.pinned{background:var(--coral);border-color:var(--coral);color:#fff}
+.gpending{font-size:.8rem;color:var(--muted);margin-top:10px}
 .empty .big{font-size:2rem;margin-bottom:8px}
 .err{margin:0 14px 14px;background:var(--coral-soft);border:1px solid #ffc9c2;color:var(--coral-deep);
   border-radius:12px;padding:12px 14px;font-size:.82rem;line-height:1.5}
@@ -244,6 +284,13 @@ footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;lin
         <div class="qlist" id="pinList"></div>
       </section>
 
+      <section class="section" id="gianSection">
+        <h2 class="gian-h">🏛️ 町田市議会の議案 <span class="cnt" id="gianCnt"></span></h2>
+        <div class="dayfilterbar">本会議の日：<select id="gianDay" class="dayfilter"></select>
+          <span class="gian-src">出典：<a href="https://www.gikai-machida.jp/g07_giketsu.asp" target="_blank" rel="noopener">町田市議会「議案の概要・議決結果」</a></span></div>
+        <div class="qlist" id="gianList"><div class="empty">議案を読み込んでいます…</div></div>
+      </section>
+
       <section class="section">
         <h2>❓ 市民の素朴な疑問 <span class="cnt" id="genCnt"></span></h2>
         <div id="errBox"></div>
@@ -264,8 +311,8 @@ footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;lin
       </section>
 
       <section class="section">
-        <h2>🕘 過去の履歴 <span class="cnt" id="histCnt"></span></h2>
-        <div class="qlist" id="histList">
+        <h2 class="fold-h" id="histToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="histList"><span class="fold-ic">▶</span>🕘 過去の履歴 <span class="fold-tip" id="histTip">（クリックで開く）</span><span class="cnt" id="histCnt"></span></h2>
+        <div class="qlist" id="histList" hidden>
           <div class="empty" id="histEmpty">これまでに入力した議案・プロンプトがここに記録されます。</div>
         </div>
       </section>
@@ -456,6 +503,7 @@ function card(item,idx,pinnedCtx){
     <div class="qnum">${pinnedCtx?'📌':(idx+1)}</div>
     <div class="qbody">
       <div class="qtext"></div>
+      ${item.detail?`<div class="qdetail"><b>📍 具体的には</b><span></span></div>`:''}
       ${item.note?`<div class="qnote"></div>`:''}
       <div class="qacts">
         <button class="iact play" type="button">${IC.play}<span class="lbl">読み上げ</span></button>
@@ -463,7 +511,8 @@ function card(item,idx,pinnedCtx){
         <button class="iact copybtn" type="button">${IC.copy}<span>コピー</span></button>
       </div>
     </div>`;
-  el.querySelector('.qtext').textContent=item.q;
+  el.querySelector('.qtext').textContent=item.display||item.q;
+  if(item.detail)el.querySelector('.qdetail span').textContent=item.detail;
   if(item.note)el.querySelector('.qnote').textContent=item.note;
   el.querySelector('.play').addEventListener('click',()=>speak(item.q,el,item.id));
   el.querySelector('.pinbtn').addEventListener('click',()=>togglePin(item));
@@ -651,19 +700,62 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 function fmtTs(s){ if(!s)return''; const d=new Date(s); if(isNaN(d.getTime()))return String(s);
   const p=n=>('0'+n).slice(-2); return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
 
-// 過去の履歴を描画
+// 過去の履歴を描画（初期は折りたたみ。各行に削除ボタン）
+let histOpen=false;
+const histDeleted=new Map();   // 削除済み（スプレッドシートに反映されるまで画面から隠す）key→時刻
+function histKey(it){return String(it.ts||'')+'|'+String(it.text||'').trim();}
 function renderHistory(items){
+  const now=Date.now();
+  histDeleted.forEach((t,k)=>{ if(now-t>120000) histDeleted.delete(k); });
+  items=(items||[]).filter(it=>!histDeleted.has(histKey(it)));
   const list=document.getElementById('histList');
   document.getElementById('histCnt').textContent=items.length?`${items.length}件`:'';
   if(!items.length){list.innerHTML='<div class="empty">まだ履歴がありません。</div>';return;}
   list.innerHTML='';
   items.forEach(it=>{
     const el=document.createElement('div');el.className='histrow';
-    el.innerHTML=`<div class="ht">${esc(fmtTs(it.ts))}</div><div class="hx">${esc(it.text||'')}</div>`;
+    el.innerHTML=`<div class="ht">${esc(fmtTs(it.ts))}</div><div class="hx">${esc(it.text||'')}</div><button class="hdel" type="button" title="この履歴を削除">🗑 削除</button>`;
+    const btn=el.querySelector('.hdel'); let armT=null;
+    btn.addEventListener('click',()=>{
+      if(!btn.classList.contains('armed')){   // 1回目：確認状態に（3秒で戻る）
+        btn.classList.add('armed');btn.textContent='本当に削除？';
+        armT=setTimeout(()=>{btn.classList.remove('armed');btn.textContent='🗑 削除';},3000);
+        return;
+      }
+      clearTimeout(armT); deleteHistory(it,el);
+    });
     list.appendChild(el);
   });
-  capList(list,5);
+  if(histOpen)capList(list,5);
 }
+function deleteHistory(it,el){
+  histDeleted.set(histKey(it),Date.now());
+  if(el)el.remove();
+  const list=document.getElementById('histList');
+  const left=list.querySelectorAll('.histrow').length;
+  document.getElementById('histCnt').textContent=left?`${left}件`:'';
+  if(!left)list.innerHTML='<div class="empty">まだ履歴がありません。</div>';
+  if(histOpen)capList(list,5);
+  if(!gasReady)return;
+  try{
+    fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'deleteLog',ts:it.ts,text:String(it.text||'')})});
+  }catch(e){}
+  setTimeout(loadData,2000);
+}
+function setHistOpen(open){
+  histOpen=open;
+  const h=document.getElementById('histToggle'), list=document.getElementById('histList');
+  h.setAttribute('aria-expanded',open?'true':'false');
+  document.getElementById('histTip').textContent=open?'（クリックで閉じる）':'（クリックで開く）';
+  list.hidden=!open;
+  if(open)capList(list,5);
+}
+(function(){
+  const h=document.getElementById('histToggle');
+  h.addEventListener('click',()=>setHistOpen(!histOpen));
+  h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setHistOpen(!histOpen);}});
+})();
 
 // 市民からの声を描画（読み上げ・ピン止め付きカード。日付で絞り込み可能）
 let voiceAll=[];          // 全件（マップ済み）
@@ -694,7 +786,9 @@ function renderVoices(items){
       const body=String(it.text||'').trim();
       const detail=String(it.detail||'').trim();
       const q=body&&detail ? body+'\n📍 具体的には：'+detail : body;
-      return {id:'v-'+i+'-'+(it.ts||''),q:q,note:note,day:dayOf(it.ts)};
+      // 「どこ：…／原因・状況：…／いつ頃から：…」形式は1項目ずつ改行して見やすく
+      const detailView=/^(どこ|原因・状況|いつ頃から)：/.test(detail) ? detail.split('／').join('\n') : detail;
+      return {id:'v-'+i+'-'+(it.ts||''),q:q,display:body,detail:detailView,note:note,day:dayOf(it.ts)};
     }).filter(x=>x.q);
   const days=Array.from(new Set(voiceAll.map(v=>v.day).filter(Boolean))).sort().reverse();
   if(voiceDayFilter===null) voiceDayFilter = days.length ? days[0] : 'all';  // 既定は最新日
@@ -724,6 +818,80 @@ async function loadData(){
   }catch(e){ /* 取得失敗時は前回表示を維持 */ }
 }
 
+/* ---------- 町田市議会の議案（Apps Script が公式サイトから取得し、市民の疑問をGeminiで作成） ---------- */
+let gianAll=[], gianDayFilter=null, gianRetry=0, gianTimer=null;
+const WD=['日','月','火','水','木','金','土'];
+function gianDayLabel(d){const x=new Date(d.replace(/\//g,'-')+'T00:00:00');return isNaN(x)?d:`${d}（${WD[x.getDay()]}）`;}
+function renderGian(){
+  const list=document.getElementById('gianList'), sel=document.getElementById('gianDay');
+  const days=Array.from(new Set(gianAll.map(g=>g.date).filter(Boolean))).sort().reverse();
+  if(gianDayFilter===null) gianDayFilter=days.length?days[0]:'all';
+  sel.innerHTML='';
+  days.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=gianDayLabel(d);sel.appendChild(o);});
+  const oAll=document.createElement('option');oAll.value='all';oAll.textContent='全期間';sel.appendChild(oAll);
+  sel.value=gianDayFilter;
+  const shown=gianDayFilter==='all'?gianAll:gianAll.filter(g=>g.date===gianDayFilter);
+  document.getElementById('gianCnt').textContent=gianAll.length?(gianDayFilter==='all'?`全${gianAll.length}件`:`${shown.length}件 / 全${gianAll.length}件`):'';
+  if(!gianAll.length){list.classList.remove('capped');list.style.maxHeight='';list.innerHTML='<div class="empty">議案はまだありません。</div>';return;}
+  const keepScroll=list.scrollTop;
+  list.innerHTML='';
+  shown.forEach((g,gi)=>{
+    const el=document.createElement('div');el.className='gcard';
+    const ng=/否決|不採択|不同意|不承認|不認定/.test(g.result);
+    el.innerHTML=`<div class="ghead"><span class="gno"></span>${g.result?`<span class="gres${ng?' ng':''}"></span>`:''}</div>
+      <div class="gtitle"></div>${g.summary?'<div class="gsum"></div>':''}
+      <div class="gmeta"></div>
+      <div class="gqs-h">💭 市民が抱きそうな疑問</div>`;
+    el.querySelector('.gno').textContent=g.no;
+    if(g.result)el.querySelector('.gres').textContent=g.result.replace(/\s*\(/,'（').replace(/\)$/,'）');
+    el.querySelector('.gtitle').textContent=g.title;
+    if(g.summary)el.querySelector('.gsum').textContent=g.summary;
+    el.querySelector('.gmeta').textContent=`📅 ${gianDayLabel(g.date)} 本会議　・　${g.session}`;
+    const qs=(g.questions||[]).filter(x=>x&&x.q).slice(0,5);
+    if(!qs.length){const p=document.createElement('div');p.className='gpending';p.textContent='⏳ 疑問を準備中です（しばらくすると表示されます）';el.appendChild(p);}
+    else{
+      const ol=document.createElement('ol');ol.className='gqs';
+      qs.forEach((x,i)=>{
+        const id='gq-'+g.no+'-'+i, q=String(x.q).trim(), note=(x.note?String(x.note).trim():'');
+        const li=document.createElement('li');
+        li.innerHTML=`<span class="gq"></span><span class="gqa"><button class="iact play" type="button" title="読み上げ">${IC.play}<span class="lbl" hidden>読み上げ</span></button><button class="iact pinq${isPinned(q)?' pinned':''}" type="button" title="ピン止め">${IC.pin}</button></span>`;
+        li.querySelector('.gq').textContent=q;
+        li.querySelector('.play').addEventListener('click',()=>speak(q,li,id));
+        li.querySelector('.pinq').addEventListener('click',(e)=>{togglePin({id:id,q:q,note:(g.no+' '+g.title+(note?'｜'+note:''))});e.currentTarget.classList.toggle('pinned',isPinned(q));});
+        ol.appendChild(li);
+      });
+      el.appendChild(ol);
+    }
+    list.appendChild(el);
+  });
+  if(!shown.length){list.innerHTML='<div class="empty">この日の議案はありません。別の日や「全期間」に切り替えてご覧ください。</div>';}
+  capList(list,5);
+  list.scrollTop=keepScroll;
+}
+async function loadGian(){
+  if(!gasReady)return;
+  clearTimeout(gianTimer);
+  try{
+    const d=await jsonp(GAS_URL+(GAS_URL.includes('?')?'&':'?')+'action=gian',90000);
+    if(d&&Array.isArray(d.gian)){
+      gianAll=d.gian.map(g=>({date:String(g.date||''),session:String(g.session||''),no:String(g.no||''),title:String(g.title||''),
+        summary:String(g.summary||''),result:String(g.result||''),questions:Array.isArray(g.questions)?g.questions:[]}));
+      renderGian();
+      // 疑問がまだの議案があれば、少し待って続きを取りに行く（サーバー側で数件ずつ作成）
+      if(d.pending>0&&gianRetry<40){gianRetry++;gianTimer=setTimeout(loadGian,8000);return;}
+      gianRetry=0;
+    }else if(!gianAll.length){
+      document.getElementById('gianList').innerHTML='<div class="empty">議案一覧を読み込めませんでした。時間をおいて再読み込みしてください。</div>';
+    }
+  }catch(e){
+    if(!gianAll.length)document.getElementById('gianList').innerHTML='<div class="empty">議案一覧を読み込めませんでした。時間をおいて再読み込みしてください。</div>';
+  }
+  gianTimer=setTimeout(loadGian,30*60*1000);   // 30分ごとに更新
+}
+document.addEventListener('change',function(e){
+  if(e.target && e.target.id==='gianDay'){ gianDayFilter=e.target.value; document.getElementById('gianList').scrollTop=0; renderGian(); }
+});
+
 // 未設定なら案内を出す。設定済みなら初回取得＋定期更新。
 (function initData(){
   if(!gasReady){
@@ -733,5 +901,6 @@ async function loadData(){
   }
   loadData();
   loadTimer=setInterval(loadData,POLL_MS);
+  loadGian();
 })();
 </script>
