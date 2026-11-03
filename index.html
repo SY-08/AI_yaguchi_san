@@ -234,6 +234,34 @@ mark.ghl{background:#fff3a6;color:inherit;padding:0 1px;border-radius:3px}
 .gqa .iact{padding:4px 7px}
 .gqa .iact.pinned{background:var(--coral);border-color:var(--coral);color:#fff}
 .gpending{font-size:.8rem;color:var(--muted);margin-top:10px}
+/* 折りたたみ欄（通常3件・開くと全部） */
+.fold2{cursor:pointer;user-select:none}
+.fold2:focus-visible{outline:2px solid var(--cyan-glow);outline-offset:-2px}
+.fold2-tip{font-size:.7rem;color:var(--muted);font-weight:500;font-family:"Noto Sans JP"}
+section.foldable.open .fold2 .fold-ic{transform:rotate(90deg)}
+.gmember{max-width:260px}
+.gno.ippan{background:#ffeef3;color:#b03060}
+.gtag.member.me{background:#b03060;border-color:#b03060;color:#fff}
+.gsum{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gbtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.gbtn{font-family:inherit;font-size:.78rem;font-weight:700;border:1px solid var(--line);background:var(--panel-2);color:var(--cyan-deep);
+  border-radius:10px;padding:6px 12px;cursor:pointer;transition:.12s}
+.gbtn:hover{border-color:var(--cyan);background:#fff}
+.gbtn.on{background:var(--cyan);border-color:var(--cyan);color:#fff}
+.gbtn:disabled{opacity:.6;cursor:wait}
+.gexp{margin-top:10px;border:1px solid #d8dcff;background:#f7f8ff;border-radius:12px;padding:11px 13px;font-size:.86rem;line-height:1.65;color:var(--ink)}
+.gexp-h{font-weight:700;color:#4a55a8;font-size:.82rem;margin-bottom:4px}
+.gexp-ai{font-weight:500;color:var(--muted);font-size:.7rem;margin-left:6px}
+.gexp-sum{margin:0 0 6px}
+.gexp-pts{margin:0 0 6px;padding-left:1.2em}
+.gexp-pts li{margin:2px 0}
+.gexp-imp{font-size:.82rem;color:#1a8a5f;margin-bottom:6px}
+.gexp-foot{font-size:.7rem;color:var(--muted)}
+.gexp-foot a{color:var(--cyan-deep)}
+.gexp-re{margin-left:8px;font-family:inherit;font-size:.7rem;border:1px solid var(--line);background:#fff;border-radius:7px;padding:2px 8px;cursor:pointer;color:var(--ink-soft)}
+.gexp-load,.gexp-err{font-size:.84rem;color:var(--ink-soft)}
+.gexp-err{color:var(--coral-deep)}
+.genctx{margin:12px 14px 0;font-size:.82rem;font-weight:700;color:#4a55a8;background:#f3f4ff;border:1px solid #d8dcff;border-radius:10px;padding:8px 11px}
 .empty .big{font-size:2rem;margin-bottom:8px}
 .err{margin:0 14px 14px;background:var(--coral-soft);border:1px solid #ffc9c2;color:var(--coral-deep);
   border-radius:12px;padding:12px 14px;font-size:.82rem;line-height:1.5}
@@ -298,21 +326,25 @@ footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;lin
         <div class="qlist" id="pinList"></div>
       </section>
 
-      <section class="section" id="gianSection">
-        <h2 class="gian-h">🏛️ 町田市議会の議案 <span class="cnt" id="gianCnt"></span></h2>
+      <section class="section foldable" id="gianSection" data-opencap="10">
+        <h2 class="gian-h fold2" role="button" tabindex="0" aria-expanded="false"><span class="fold-ic">▶</span>🏛️ 町田市議会の議案・一般質問 <span class="fold2-tip">（3件表示中・クリックで広げる）</span><span class="cnt" id="gianCnt"></span></h2>
         <div class="gianbar">
           <input id="gianQ" class="gsearch" type="search" placeholder="🔍 キーワードで探す（例：公園、保育、補正予算、建設常任委員会）" aria-label="議案をキーワードで検索">
-          <div class="gfil" id="gianFil" role="group" aria-label="提出者で絞り込み">
-            <button type="button" class="on" data-p="">すべて</button><button type="button" data-p="市長提出">市長提出</button><button type="button" data-p="議員提出">議員提出</button>
+          <select id="gianMember" class="dayfilter gmember" aria-label="議員で絞り込み"><option value="">🙋 すべての議員</option></select>
+        </div>
+        <div class="gianbar">
+          <div class="gfil" id="gianFil" role="group" aria-label="種類で絞り込み">
+            <button type="button" class="on" data-p="">すべて</button><button type="button" data-p="議案">議案</button><button type="button" data-p="市長提出">市長提出</button><button type="button" data-p="議員提出">議員提出</button><button type="button" data-p="一般質問">一般質問</button>
           </div>
         </div>
-        <div class="dayfilterbar">本会議の日：<select id="gianDay" class="dayfilter"></select>
-          <span class="gian-src">出典：<a href="https://www.gikai-machida.jp/g07_giketsu.asp" target="_blank" rel="noopener">町田市議会「議案の概要・議決結果」</a></span></div>
+        <div class="dayfilterbar">日付：<select id="gianDay" class="dayfilter"></select>
+          <span class="gian-src">出典：町田市議会「<a href="https://www.gikai-machida.jp/g07_giketsu.asp" target="_blank" rel="noopener">議案の概要・議決結果</a>」「<a href="https://www.gikai-machida.jp/g07_Shitsumon.asp" target="_blank" rel="noopener">一般質問</a>」</span></div>
         <div class="qlist" id="gianList"><div class="empty">議案を読み込んでいます…</div></div>
       </section>
 
-      <section class="section">
-        <h2>❓ 市民の素朴な疑問 <span class="cnt" id="genCnt"></span></h2>
+      <section class="section foldable" id="genSection" data-opencap="0">
+        <h2 class="fold2" role="button" tabindex="0" aria-expanded="false"><span class="fold-ic">▶</span>❓ 市民の素朴な疑問 <span class="fold2-tip">（3件表示中・クリックで広げる）</span><span class="cnt" id="genCnt"></span></h2>
+        <div class="genctx" id="genCtx" hidden></div>
         <div id="errBox"></div>
         <div class="qlist" id="genList">
           <div class="empty" id="emptyState">
@@ -322,8 +354,8 @@ footer{text-align:center;color:var(--muted);font-size:.74rem;margin-top:30px;lin
         </div>
       </section>
 
-      <section class="section">
-        <h2 class="voice-h">📣 市民からの声 <span class="cnt" id="voiceCnt"></span></h2>
+      <section class="section foldable" id="voiceSection" data-opencap="0">
+        <h2 class="voice-h fold2" role="button" tabindex="0" aria-expanded="false"><span class="fold-ic">▶</span>📣 市民からの声 <span class="fold2-tip">（3件表示中・クリックで広げる）</span><span class="cnt" id="voiceCnt"></span></h2>
         <div class="dayfilterbar">表示する日：<select id="voiceDay" class="dayfilter"></select></div>
         <div class="qlist" id="voiceList">
           <div class="empty" id="voiceEmpty">アンケートから届いた市民の声がここに表示されます。</div>
@@ -547,6 +579,8 @@ function card(item,idx,pinnedCtx){
 function capList(list,n){
   n=n||5;
   if(!list)return;
+  const fc=foldCap(list);           // 折りたたみ欄：閉じている間は3件、開いたら opencap 件（0=全部）
+  if(fc!==null){ n=fc; if(!n){list.classList.remove('capped');list.style.maxHeight='';return;} }
   list.classList.remove('capped');
   list.style.maxHeight='';
   const kids=Array.prototype.slice.call(list.children).filter(el=>!el.classList.contains('empty'));
@@ -593,7 +627,7 @@ function clearErr(){errBox.innerHTML='';}
 
 async function generate(){
   const text=document.getElementById('agenda').value.trim();
-  clearErr();
+  clearErr(); setGenCtx('');
   if(text.length<8){showErr('議案の内容をもう少し詳しく貼り付けてください。');return;}
   const empty=document.getElementById('emptyState'); if(empty)empty.remove();
 
@@ -838,11 +872,20 @@ async function loadData(){
   }catch(e){ /* 取得失敗時は前回表示を維持 */ }
 }
 
-/* ---------- 町田市議会の議案（Apps Script が公式サイトから取得し、市民の疑問をGeminiで作成） ---------- */
-let gianAll=[], gianDayFilter=null, gianRetry=0, gianTimer=null, gianQuery='', gianProp='';
-function gianHaystack(g){return [g.no,g.title,g.summary,g.result,g.session,g.proposer,g.committee,(g.questions||[]).map(x=>x&&x.q).join(' ')].join(' ').toLowerCase();}
+/* ---------- 町田市議会の議案・一般質問（Apps Script が公式サイトから取得） ----------
+   - 議案（市長提出／議員提出）と一般質問（議員ごとの質問項目）を一つの一覧に
+   - 「💭 市民の疑問を想定」→ ❓市民の素朴な疑問 欄に表示
+   - 「📝 概要とポイント」→ その議案カードの下にそのまま表示
+   どちらもボタンを押したときに Gemini で作成し、一度作ったものは保存されて次からすぐ出る */
+let gianAll=[], gianDayFilter=null, gianTimer=null, gianQuery='', gianType='', gianMember='';
+const MY_NAME='矢口 まゆ';
+function gianHaystack(g){return [g.no,g.title,g.summary,g.result,g.session,g.proposer,g.committee,g.member,g.party].join(' ').toLowerCase();}
 function gianMatch(g){
-  if(gianProp&&g.proposer!==gianProp)return false;
+  if(gianType==='議案'&&g.kind!=='gian')return false;
+  if(gianType==='市長提出'&&g.proposer!=='市長提出')return false;
+  if(gianType==='議員提出'&&g.proposer!=='議員提出')return false;
+  if(gianType==='一般質問'&&g.kind!=='ippan')return false;
+  if(gianMember&&g.member!==gianMember)return false;
   const terms=gianQuery.toLowerCase().split(/[\s　]+/).filter(Boolean);
   if(!terms.length)return true;
   const h=gianHaystack(g); return terms.every(t=>h.includes(t));
@@ -856,10 +899,20 @@ function hlText(el,text){   // 検索語をハイライトして表示（XSS対�
 }
 const WD=['日','月','火','水','木','金','土'];
 function gianDayLabel(d){const x=new Date(d.replace(/\//g,'-')+'T00:00:00');return isNaN(x)?d:`${d}（${WD[x.getDay()]}）`;}
-function renderGian(){
-  const list=document.getElementById('gianList'), sel=document.getElementById('gianDay');
+function gianLabel(g){return g.kind==='ippan'?`一般質問「${g.title}」（${g.member}議員）`:`${g.no}「${g.title}」`;}
+
+function buildMemberOptions(){
+  const sel=document.getElementById('gianMember'); if(!sel)return;
+  const names=Array.from(new Set(gianAll.map(g=>g.member).filter(Boolean)));
+  names.sort((a,b)=>a===MY_NAME?-1:b===MY_NAME?1:a.localeCompare(b,'ja'));
+  const cnt={}; gianAll.forEach(g=>{if(g.member)cnt[g.member]=(cnt[g.member]||0)+1;});
+  sel.innerHTML='<option value="">🙋 すべての議員</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}（${cnt[n]}件）</option>`).join('');
+  sel.value=gianMember;
+}
+function buildDayOptions(){
+  const sel=document.getElementById('gianDay');
   const days=Array.from(new Set(gianAll.map(g=>g.date).filter(Boolean))).sort().reverse();
-  if(gianDayFilter===null) gianDayFilter=days.length?days[0]:'all';
+  if(gianDayFilter===null) gianDayFilter='all';
   sel.innerHTML='';
   const oAll=document.createElement('option');oAll.value='all';oAll.textContent='全期間（2026年）';sel.appendChild(oAll);
   const sessOf={}; gianAll.forEach(g=>{ if(g.date&&!sessOf[g.date]) sessOf[g.date]=g.session; });
@@ -870,52 +923,97 @@ function renderGian(){
     const o=document.createElement('option');o.value=d;o.textContent=gianDayLabel(d);grp.appendChild(o);
   });
   sel.value=gianDayFilter;
+}
+function renderGian(){
+  const list=document.getElementById('gianList');
+  buildDayOptions(); buildMemberOptions();
   const shown=(gianDayFilter==='all'?gianAll:gianAll.filter(g=>g.date===gianDayFilter)).filter(gianMatch);
-  const filtering=gianDayFilter!=='all'||gianQuery||gianProp;
+  const filtering=gianDayFilter!=='all'||gianQuery||gianType||gianMember;
   document.getElementById('gianCnt').textContent=gianAll.length?(filtering?`${shown.length}件 / 全${gianAll.length}件`:`全${gianAll.length}件`):'';
   if(!gianAll.length){list.classList.remove('capped');list.style.maxHeight='';list.innerHTML='<div class="empty">議案はまだありません。</div>';return;}
-  const keepScroll=list.scrollTop;
   list.innerHTML='';
-  shown.forEach((g,gi)=>{
-    const el=document.createElement('div');el.className='gcard';
-    const ng=/否決|不採択|不同意|不承認|不認定/.test(g.result);
-    el.innerHTML=`<div class="ghead"><span class="gno"></span>${g.result?`<span class="gres${ng?' ng':''}"></span>`:''}</div>
-      <div class="gtitle"></div>${g.summary?'<div class="gsum"></div>':''}
-      <div class="gtags"></div>
-      <div class="gmeta"></div>
-      <div class="gqs-h">💭 市民が抱きそうな疑問</div>`;
-    el.querySelector('.gno').textContent=g.no;
-    if(g.result)el.querySelector('.gres').textContent=g.result.replace(/\s*\(/,'（').replace(/\)$/,'）');
-    hlText(el.querySelector('.gtitle'),g.title);
-    if(g.summary)hlText(el.querySelector('.gsum'),g.summary);
-    const tg=el.querySelector('.gtags');
-    const tags=[];
-    if(g.proposer)tags.push({t:(g.proposer==='市長提出'?'🏛 ':'🙋 ')+g.proposer,cls:g.proposer==='市長提出'?'mayor':(g.proposer==='議員提出'?'member':''),p:g.proposer});
+  shown.forEach(g=>list.appendChild(gianCard(g)));
+  if(!shown.length){list.innerHTML='<div class="empty">条件に合うものが見つかりませんでした。キーワードや絞り込みを変えるか、「全期間」にしてみてください。</div>';}
+  capList(list,3);
+  list.scrollTop=0;
+}
+function gianCard(g){
+  const el=document.createElement('div');el.className='gcard';
+  const ng=/否決|不採択|不同意|不承認|不認定/.test(g.result);
+  el.innerHTML=`<div class="ghead"><span class="gno${g.kind==='ippan'?' ippan':''}"></span>${g.result?`<span class="gres${ng?' ng':''}"></span>`:''}</div>
+    <div class="gtitle"></div>${g.summary?'<div class="gsum"></div>':''}
+    <div class="gtags"></div>
+    <div class="gmeta"></div>
+    <div class="gbtns"><button type="button" class="gbtn gbq">💭 市民の疑問を想定</button><button type="button" class="gbtn gbx">📝 概要とポイント</button></div>
+    <div class="gexp" hidden></div>`;
+  el.querySelector('.gno').textContent=g.kind==='ippan'?'一般質問':g.no;
+  if(g.result)el.querySelector('.gres').textContent=g.result.replace(/\s*\(/,'（').replace(/\)$/,'）');
+  hlText(el.querySelector('.gtitle'),g.title);
+  if(g.summary)hlText(el.querySelector('.gsum'),g.summary);
+  const tg=el.querySelector('.gtags'); const tags=[];
+  if(g.kind==='ippan'){
+    tags.push({t:'🙋 '+g.member+(g.member===MY_NAME?'（矢口議員）':''),cls:'member'+(g.member===MY_NAME?' me':''),m:g.member});
+    if(g.party)tags.push({t:'🏷 '+g.party,q:g.party});
+  }else{
+    if(g.proposer)tags.push({t:(g.proposer==='市長提出'?'🏛 ':'🙋 ')+g.proposer,cls:g.proposer==='市長提出'?'mayor':'member',p:g.proposer});
     String(g.committee||'').split('・').filter(Boolean).forEach(c=>tags.push({t:'📂 '+c,q:c}));
-    tags.forEach(x=>{const b=document.createElement('span');b.className='gtag '+(x.cls||'');b.textContent=x.t;b.title=x.p?'この提出者で絞り込む':'この委員会で検索';
-      b.addEventListener('click',()=>{ if(x.p){setGianProp(x.p);} else {setGianQuery(x.q);} });tg.appendChild(b);});
-    if(!tags.length)tg.remove();
-    el.querySelector('.gmeta').textContent=`📅 ${gianDayLabel(g.date)} 本会議　・　${g.session}`;
-    const qs=(g.questions||[]).filter(x=>x&&x.q).slice(0,5);
-    if(!qs.length){const p=document.createElement('div');p.className='gpending';p.textContent='⏳ 疑問を準備中です（しばらくすると表示されます）';el.appendChild(p);}
-    else{
-      const ol=document.createElement('ol');ol.className='gqs';
-      qs.forEach((x,i)=>{
-        const id='gq-'+g.no+'-'+i, q=String(x.q).trim(), note=(x.note?String(x.note).trim():'');
-        const li=document.createElement('li');
-        li.innerHTML=`<span class="gq"></span><span class="gqa"><button class="iact play" type="button" title="読み上げ">${IC.play}<span class="lbl" hidden>読み上げ</span></button><button class="iact pinq${isPinned(q)?' pinned':''}" type="button" title="ピン止め">${IC.pin}</button></span>`;
-        hlText(li.querySelector('.gq'),q);
-        li.querySelector('.play').addEventListener('click',()=>speak(q,li,id));
-        li.querySelector('.pinq').addEventListener('click',(e)=>{togglePin({id:id,q:q,note:(g.no+' '+g.title+(note?'｜'+note:''))});e.currentTarget.classList.toggle('pinned',isPinned(q));});
-        ol.appendChild(li);
-      });
-      el.appendChild(ol);
-    }
-    list.appendChild(el);
-  });
-  if(!shown.length){list.innerHTML=(gianQuery||gianProp)?'<div class="empty">条件に合う議案が見つかりませんでした。キーワードを変えるか、「本会議の日」を「全期間」にしてみてください。</div>':'<div class="empty">この日の議案はありません。別の日や「全期間」に切り替えてご覧ください。</div>';}
-  capList(list,5);
-  list.scrollTop=keepScroll;
+  }
+  tags.forEach(x=>{const b=document.createElement('span');b.className='gtag '+(x.cls||'');b.textContent=x.t;
+    b.title=x.m?'この議員で絞り込む':(x.p?'この提出者で絞り込む':'このことばで検索');
+    b.addEventListener('click',()=>{ if(x.m)setGianMember(x.m); else if(x.p)setGianType(x.p); else setGianQuery(x.q); });tg.appendChild(b);});
+  if(!tags.length)tg.remove();
+  el.querySelector('.gmeta').textContent=`📅 ${gianDayLabel(g.date)} ${g.kind==='ippan'?'質問':'本会議'}　・　${g.session}`;
+  const exp=el.querySelector('.gexp'), bx=el.querySelector('.gbx'), bq=el.querySelector('.gbq');
+  if(g.explain&&g._open){renderExplain(exp,g);exp.hidden=false;bx.classList.add('on');}
+  bx.addEventListener('click',()=>toggleExplain(g,el));
+  bq.addEventListener('click',()=>askQuestions(g,bq));
+  return el;
+}
+function recap(){const list=document.getElementById('gianList');const st=list.scrollTop;capList(list,3);list.scrollTop=st;}
+function renderExplain(box,g){
+  const x=g.explain||{};
+  box.innerHTML='<div class="gexp-h">📝 概要とポイント <span class="gexp-ai">AIやぐちさんのまとめ</span></div><p class="gexp-sum"></p><ul class="gexp-pts"></ul><div class="gexp-imp" hidden></div>'+
+    '<div class="gexp-foot">※AIによる要約です。正確な内容は<a href="'+(g.kind==='ippan'?'https://www.gikai-machida.jp/g07_Shitsumon.asp':'https://www.gikai-machida.jp/g07_giketsu.asp')+'" target="_blank" rel="noopener">町田市議会の公式資料</a>でご確認ください。<button type="button" class="gexp-re">作り直す</button></div>';
+  box.querySelector('.gexp-sum').textContent=x.summary||'';
+  const ul=box.querySelector('.gexp-pts');(x.points||[]).forEach(p=>{const li=document.createElement('li');li.textContent=p;ul.appendChild(li);});
+  if(x.impact){const im=box.querySelector('.gexp-imp');im.hidden=false;im.textContent='🏠 暮らしとの関係：'+x.impact;}
+  box.querySelector('.gexp-re').addEventListener('click',()=>loadExplain(g,box.closest('.gcard'),true));
+}
+function toggleExplain(g,el){
+  const box=el.querySelector('.gexp'), b=el.querySelector('.gbx');
+  if(!box.hidden&&!box.classList.contains('loading')){box.hidden=true;b.classList.remove('on');g._open=false;recap();return;}
+  if(g.explain){renderExplain(box,g);box.hidden=false;b.classList.add('on');g._open=true;recap();return;}
+  loadExplain(g,el,false);
+}
+async function loadExplain(g,el,force){
+  const box=el.querySelector('.gexp'), b=el.querySelector('.gbx');
+  box.hidden=false;box.classList.add('loading');b.classList.add('on');b.disabled=true;
+  box.innerHTML='<div class="gexp-load">🔎 AIやぐちさんが調べています…（10〜30秒ほど）</div>';recap();
+  try{
+    const d=await jsonp(GAS_URL+(GAS_URL.includes('?')?'&':'?')+'action=gx&key='+encodeURIComponent(g.key)+(force?'&force=1':''),90000);
+    if(d&&d.ok&&d.explain){g.explain=d.explain;g._open=true;renderExplain(box,g);}
+    else box.innerHTML='<div class="gexp-err">うまくまとめられませんでした（'+esc(d&&d.error||'不明なエラー')+'）。少し時間をおいて、もう一度押してください。</div>';
+  }catch(e){box.innerHTML='<div class="gexp-err">通信がタイムアウトしました。もう一度押してください。</div>';}
+  box.classList.remove('loading');b.disabled=false;recap();
+}
+function setGenCtx(text){const c=document.getElementById('genCtx');if(!c)return;c.textContent=text;c.hidden=!text;}
+async function askQuestions(g,btn){
+  clearErr();
+  const sec=document.getElementById('genSection'), list=document.getElementById('genList');
+  setGenCtx('🏛 '+gianLabel(g)+' について、市民が抱きそうな疑問');
+  const show=(qs)=>{gen=qs.filter(x=>x&&x.q).map((x,i)=>({id:'gq-'+g.key+'-'+i,q:String(x.q).trim(),note:x.note?String(x.note).trim():''}));renderGen();};
+  if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
+  if(g.questions&&g.questions.length){show(g.questions);return;}
+  btn.disabled=true;const old=btn.textContent;btn.textContent='⏳ 考えています…';
+  list.innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  document.getElementById('genCnt').textContent='';
+  setState('thinking');
+  try{
+    const d=await jsonp(GAS_URL+(GAS_URL.includes('?')?'&':'?')+'action=gq&key='+encodeURIComponent(g.key),90000);
+    if(d&&d.ok&&d.questions&&d.questions.length){g.questions=d.questions;show(d.questions);}
+    else{list.innerHTML='';gen=[];showErr(d&&d.error==='no_key'?'AIの設定（APIキー）が見つかりませんでした。':'うまく疑問を作れませんでした。少し時間をおいて、もう一度押してください。');}
+  }catch(e){list.innerHTML='';gen=[];showErr('通信がタイムアウトしました。もう一度押してください。');}
+  finally{setState('idle');btn.disabled=false;btn.textContent=old;}
 }
 async function loadGian(){
   if(!gasReady)return;
@@ -923,13 +1021,13 @@ async function loadGian(){
   try{
     const d=await jsonp(GAS_URL+(GAS_URL.includes('?')?'&':'?')+'action=gian',90000);
     if(d&&Array.isArray(d.gian)){
-      gianAll=d.gian.map(g=>({date:String(g.date||''),session:String(g.session||''),no:String(g.no||''),title:String(g.title||''),
-        summary:String(g.summary||''),result:String(g.result||''),questions:Array.isArray(g.questions)?g.questions:[],
-        proposer:String(g.proposer||''),committee:String(g.committee||'')}));
+      const prev={}; gianAll.forEach(g=>prev[g.key]=g);
+      gianAll=d.gian.map((g,i)=>{const o={kind:g.kind==='ippan'?'ippan':'gian',key:String(g.key||''),date:String(g.date||''),session:String(g.session||''),no:String(g.no||''),title:String(g.title||''),
+        summary:String(g.summary||''),result:String(g.result||''),proposer:String(g.proposer||''),committee:String(g.committee||''),
+        member:String(g.member||''),party:String(g.party||''),questions:Array.isArray(g.questions)?g.questions:[],explain:g.explain||null,_i:i};
+        const p=prev[o.key]; if(p){o._open=p._open; if(!o.explain&&p.explain)o.explain=p.explain; if(!o.questions.length&&p.questions)o.questions=p.questions;} return o;});
+      gianAll.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(a.kind===b.kind?a._i-b._i:(a.kind==='gian'?-1:1)));
       renderGian();
-      // 疑問がまだの議案があれば、少し待って続きを取りに行く（サーバー側で数件ずつ作成）
-      if(d.pending>0&&gianRetry<40){gianRetry++;gianTimer=setTimeout(loadGian,8000);return;}
-      gianRetry=0;
     }else if(!gianAll.length){
       document.getElementById('gianList').innerHTML='<div class="empty">議案一覧を読み込めませんでした。時間をおいて再読み込みしてください。</div>';
     }
@@ -939,22 +1037,40 @@ async function loadGian(){
   gianTimer=setTimeout(loadGian,30*60*1000);   // 30分ごとに更新
 }
 document.addEventListener('change',function(e){
-  if(e.target && e.target.id==='gianDay'){ gianDayFilter=e.target.value; document.getElementById('gianList').scrollTop=0; renderGian(); }
+  if(e.target && e.target.id==='gianDay'){ gianDayFilter=e.target.value; renderGian(); }
+  if(e.target && e.target.id==='gianMember'){ setGianMember(e.target.value); }
 });
 let gianQT=null;
 function setGianQuery(q){
   const inp=document.getElementById('gianQ'); if(inp.value!==q)inp.value=q;
-  const wasEmpty=!gianQuery; gianQuery=String(q||'').trim();
-  if(gianQuery&&wasEmpty&&gianDayFilter!=='all') gianDayFilter='all';   // 検索を始めたら全期間から探す
-  document.getElementById('gianList').scrollTop=0; renderGian();
+  gianQuery=String(q||'').trim(); renderGian();
 }
-function setGianProp(p){
-  gianProp=p||'';
-  document.querySelectorAll('#gianFil button').forEach(b=>b.classList.toggle('on',(b.dataset.p||'')===gianProp));
-  document.getElementById('gianList').scrollTop=0; renderGian();
+function setGianType(p){
+  gianType=p||'';
+  document.querySelectorAll('#gianFil button').forEach(b=>b.classList.toggle('on',(b.dataset.p||'')===gianType));
+  renderGian();
+}
+function setGianMember(m){
+  gianMember=m||'';
+  if(gianMember&&gianType&&gianType!=='一般質問')setGianType('');   // 議員で絞るときは種別をゆるめる
+  else renderGian();
 }
 document.getElementById('gianQ').addEventListener('input',e=>{clearTimeout(gianQT);const v=e.target.value;gianQT=setTimeout(()=>setGianQuery(v),200);});
-document.querySelectorAll('#gianFil button').forEach(b=>b.addEventListener('click',()=>setGianProp(b.dataset.p)));
+document.querySelectorAll('#gianFil button').forEach(b=>b.addEventListener('click',()=>setGianType(b.dataset.p)));
+
+/* ---------- 折りたたみ（議案・素朴な疑問・市民からの声）：通常は3件、開くと全部 ---------- */
+function foldCap(list){const sec=list&&list.closest('section.foldable');if(!sec)return null;return sec.classList.contains('open')?(+sec.dataset.opencap||0):3;}
+function setFold(sec,open){
+  sec.classList.toggle('open',open);
+  const h=sec.querySelector('.fold2'); if(h)h.setAttribute('aria-expanded',open?'true':'false');
+  const tip=sec.querySelector('.fold2-tip'); if(tip)tip.textContent=open?'（クリックで3件表示に戻す）':'（3件表示中・クリックで広げる）';
+  const list=sec.querySelector('.qlist'); if(list)capList(list,3);
+}
+document.querySelectorAll('section.foldable').forEach(sec=>{
+  const h=sec.querySelector('.fold2'); if(!h)return;
+  h.addEventListener('click',()=>setFold(sec,!sec.classList.contains('open')));
+  h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setFold(sec,!sec.classList.contains('open'));}});
+});
 
 // 未設定なら案内を出す。設定済みなら初回取得＋定期更新。
 (function initData(){
